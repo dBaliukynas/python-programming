@@ -5,8 +5,17 @@ import os
 
 def print_groups(sorted_groups):
     for ip_address, sorted_logs in sorted_groups.items():
-        print(f'{ip_address} => {sorted_logs}\n')
-
+        print(f'\n{ip_address}:')
+        
+        for sorted_log in sorted_logs['logs']:
+            print(f'{sorted_log}\n')
+        print(f'''+----------------------------------------------------+
+| TOTAL BYTES                                        |
++====================================================+
+| {sorted_logs['total_bytes']}                                             |
++----------------------------------------------------+''')
+        
+      
 def count_ip(logs_grouped_by_ip):
 
     for log_groups in logs_grouped_by_ip.values():

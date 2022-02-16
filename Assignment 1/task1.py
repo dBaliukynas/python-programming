@@ -62,20 +62,8 @@ if __name__ == '__main__':
         if not os.path.getsize(filename):
             print(f'File \"{filename.split("/").pop()}\" cannot be empty')
             quit()
-# =============================================================================
-#         if (len(args) > 5):
-#             print(f'''Maximum amount of arguments is 5. 
-# Passed {len(args)} arguments.''')
-#             quit()
-# =============================================================================
-        # count_ip_occurences()
        
         count_ip(group_requests_by_ip(parse_log_file(log_file)))
         
-# =============================================================================
-#         for line in log_file:
-#             print("")
-# =============================================================================
-            
 
 

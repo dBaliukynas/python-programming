@@ -8,12 +8,19 @@ def print_groups(sorted_groups):
         print(f'\n{ip_address}:')
         
         for sorted_log in sorted_logs['logs']:
+            
             print(f'{sorted_log}\n')
-        print(f'''+----------------------------------------------------+
-| TOTAL BYTES                                        |
-+====================================================+
-| {sorted_logs['total_bytes']}                                             |
-+----------------------------------------------------+''')
+        total_bytes_digits=len(str(sorted_logs['total_bytes']))
+        spaces=' ' * total_bytes_digits
+        dashes='-'  * total_bytes_digits
+        equal='=' * total_bytes_digits
+    
+                           
+        print(f'''+------------{dashes}+
+| TOTAL BYTES{spaces}|
++============{equal}+
+| {sorted_logs['total_bytes']}           |
++------------{dashes}+''')
         
       
 def count_ip(logs_grouped_by_ip):

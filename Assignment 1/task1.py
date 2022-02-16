@@ -11,16 +11,16 @@ def print_groups(sorted_groups):
             
             print(f'{sorted_log}\n')
         total_bytes_digits=len(str(sorted_logs['total_bytes']))
-        spaces=' ' * total_bytes_digits
-        dashes='-'  * total_bytes_digits
-        equal='=' * total_bytes_digits
+        space_symbols=' ' * total_bytes_digits
+        dash_symbols='-'  * total_bytes_digits
+        equal_symbols='=' * total_bytes_digits
     
                            
-        print(f'''+------------{dashes}+
-| TOTAL BYTES{spaces}|
-+============{equal}+
+        print(f'''+------------{dash_symbols}+
+| TOTAL BYTES{space_symbols}|
++============{ equal_symbols}+
 | {sorted_logs['total_bytes']}           |
-+------------{dashes}+''')
++------------{dash_symbols}+''')
         
       
 def count_ip(logs_grouped_by_ip):
@@ -29,8 +29,8 @@ def count_ip(logs_grouped_by_ip):
         total_bytes = 0
        
         for log_group in log_groups['logs']:
-   
-            total_bytes+=(log_group['size_in_bytes'])
+            if (log_group['size_in_bytes'] != '-' and log_group['size_in_bytes'] != '"-"\n'):
+                total_bytes+=(log_group['size_in_bytes'])
             
         log_groups['total_bytes'] = total_bytes
         
@@ -63,11 +63,19 @@ def parse_log_file(log_file):
         client_identity=line.split(' ')[1]
         auth_user=line.split(' ')[2]
         date=' '.join(line.split(' ')[3:5])
-        request=' '.join(line.split(' ')[5:8])
-        if (line.split(' ')[8] != '-'):
-            status=line.split(' ')[8]
-        if (line.split(' ')[9] != '-'):
-            size_in_bytes=int(line.split(' ')[9])
+        if (line.split(' ')[5] != '"-"' and line.split(' ')[5] != '-'):
+            request=' '.join(line.split(' ')[5:8])
+            if (line.split(' ')[8] != '-'):
+                status=line.split(' ')[8]
+            if (line.split(' ')[9] != '-' and line.split(' ')[9] != '"-"' and line.split(' ')[9] != '"-"\n' ):
+                size_in_bytes=int(line.split(' ')[9])
+            else:
+                size_in_bytes=line.split(' ')[9]
+        else:
+            request=line.split(' ')[5]
+            status=line.split(' ')[6]
+            size_in_bytes=int(line.split(' ')[7])
+            
 
         logs_dictionary={
             'ip_address':ip_address,

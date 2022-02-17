@@ -3,7 +3,7 @@
 import argparse
 import os
 
-def print_groups(sorted_groups):
+def print_sorted_groups(sorted_groups):
     for ip_address, sorted_logs in sorted_groups.items():
         print(f'\n{ip_address}:')
         
@@ -20,7 +20,6 @@ def print_groups(sorted_groups):
         dash_symbols='-'  * digit_count
         equal_symbols='=' * digit_count
             
-    
         if (args.order == 'bytes'):                 
             print(f'''+------------{dash_symbols}+
 | TOTAL BYTES{space_symbols}|
@@ -40,48 +39,60 @@ def print_groups(sorted_groups):
 | {sorted_logs['count_p']}%               |
 +-----------------{dash_symbols}+''')
                             
-def count_ip(logs_grouped_by_ip, list_of_logs_length):
-
-    for log_groups in logs_grouped_by_ip.values():
+def count_group_values(log_groups, log_list_len):
+    for group_logs in log_groups.values():
+        
         total_bytes = 0
+        
         if (args.order == 'count' or args.order == 'count_p'):  
-            count = len(log_groups['logs'])
-            log_groups['count'] = count
+            count = len(group_logs['logs'])
+            group_logs['count'] = count
             
             if(args.order == 'count_p'):
-                log_groups['count_p'] = (log_groups['count'] / list_of_logs_length) * 100
-                print(log_groups['count'])
+                group_logs['count_p'] = (group_logs['count'] / log_list_len) * 100
                    
         elif (args.order == 'bytes'):
-            for log_group in log_groups['logs']:
-                if (log_group['size_in_bytes'] != '-' and log_group['size_in_bytes'] != '"-"\n'):
-                    total_bytes+=(log_group['size_in_bytes'])
-            log_groups['total_bytes'] = total_bytes
+            for group_log in group_logs['logs']:
+                if (group_log['size_in_bytes'] != '-' and group_log['size_in_bytes'] != '"-"\n'):
+                    total_bytes+=(group_log['size_in_bytes'])
+            group_logs['total_bytes'] = total_bytes
      
-        
-    sorted_groups = dict(sorted(logs_grouped_by_ip.items(), reverse=True))
+    sorted_groups = dict(sorted(log_groups.items(), reverse=True))
     return sorted_groups
          
-def group_requests_by_ip(list_of_logs):
-
-    logs_grouped_by_ip={}
-    for log in list_of_logs:
-        if log['ip_address'] in logs_grouped_by_ip:
-            logs_grouped_by_ip[log['ip_address']]['logs'].append(log)
-        else:
-            logs_grouped_by_ip[log['ip_address']] = {'logs': [log]}
-            if (args.order == 'bytes'):
-                logs_grouped_by_ip[log['ip_address']].setdefault("total_bytes", 0)
-            elif (args.order == 'count' or args.order == 'count_p'):
-                logs_grouped_by_ip[log['ip_address']].setdefault("count", 0)
+def group_logs(log_list):
+    
+    log_groups={}
+    
+    for log in log_list:
+        if (args.group == 'ip'):
+            
+            if log['ip_address'] in log_groups:
+                log_groups[log['ip_address']]['logs'].append(log)
             else:
-                logs_grouped_by_ip[log['ip_address']].setdefault("count_p", 0)
-         
-    # print(len(list_of_logs))
-    return logs_grouped_by_ip
+                log_groups[log['ip_address']] = {'logs': [log]}
+                if (args.order == 'bytes'):
+                    log_groups[log['ip_address']].setdefault("total_bytes", 0)
+                elif (args.order == 'count' or args.order == 'count_p'):
+                    log_groups[log['ip_address']].setdefault("count", 0)
+                else:
+                    log_groups[log['ip_address']].setdefault("count_p", 0)
+        else:
+            if log['status'] in log_groups:
+                log_groups[log['status']]['logs'].append(log)
+            else:
+                log_groups[log['status']] = {'logs': [log]}
+                if (args.order == 'bytes'):
+                    log_groups[log['status']].setdefault("total_bytes", 0)
+                elif (args.order == 'count' or args.order == 'count_p'):
+                    log_groups[log['status']].setdefault("count", 0)
+                else:
+                    log_groups[log['status']].setdefault("count_p", 0)
+                
+    return log_groups
 
 def parse_log_file(log_file):
-    list_of_logs=[]
+    log_list=[]
     for line in log_file:
     
         ip_address=line.split(' ')[0]
@@ -111,19 +122,21 @@ def parse_log_file(log_file):
             'status':status,
             'size_in_bytes':size_in_bytes,
             }
-        list_of_logs.append(logs_dictionary)
-    return list_of_logs
-
+        log_list.append(logs_dictionary)
+    
+    return log_list
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Parse Common Log Format file.')
+    parser = argparse.ArgumentParser(description='Parse Common Log Format file, '\
+                                     'group logs by IP address or HTTP status code.')
     parser.add_argument('filename', help='A name of a non empty, CML format file')
-    parser.add_argument('group', choices=['ip', 'status'], help='Grouping requests by IP or HTTP Status Code')
+    parser.add_argument('group', choices=['ip', 'status'], help='Grouping logs by '\
+                        'IP address or HTTP status code')
     parser.add_argument('order', choices=['count', 'count_p', 'bytes'],
-                        help='Grouped requests will be ordered by their count, '\
+                        help='Grouped logs will be ordered by their count, '\
                         'count percentage of all logged requests (count_p) '\
                         'or by total number of bytes transferred (bytes)')
-    parser.add_argument('-limit','-l', help='Amount of rows to print')
+    parser.add_argument('-limit','-l', help='Amount of grouped logs to print')
     args = parser.parse_args()
 
     filename = args.filename
@@ -133,7 +146,7 @@ if __name__ == '__main__':
             print(f'File \"{filename.split("/").pop()}\" cannot be empty')
             quit()
        
-        list_of_logs=parse_log_file(log_file)
-        list_of_logs_length=len(list_of_logs)
-        print_groups(count_ip(group_requests_by_ip(list_of_logs), list_of_logs_length))
+        log_list=parse_log_file(log_file)
+        log_list_len=len(log_list)
+        print_sorted_groups(count_group_values(group_logs(log_list), log_list_len))
         

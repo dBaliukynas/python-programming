@@ -150,24 +150,25 @@ def parse_log_file(log_file):
     '''
     log_list=[]
     for line in log_file:
+        line_split=line.split(' ')
 
-        ip_address=line.split(' ')[0]
-        client_identity=line.split(' ')[1]
-        auth_user=line.split(' ')[2]
-        date=' '.join(line.split(' ')[3:5])
-        if line.split(' ')[5] != '"-"' and line.split(' ')[5] != '-':
-            request=' '.join(line.split(' ')[5:8])
-            if line.split(' ')[8] != '-':
-                status=line.split(' ')[8]
-            if line.split(' ')[9] != '-' and \
-            line.split(' ')[9] != '"-"' and line.split(' ')[9] != '"-"\n' :
-                size_in_bytes=int(line.split(' ')[9])
+        ip_address=line_split[0]
+        client_identity=line_split(' ')[1]
+        auth_user=line_split(' ')[2]
+        date=' '.join(line_split(' ')[3:5])
+        if line_split(' ')[5] != '"-"' and line_split(' ')[5] != '-':
+            request=' '.join(line_split(' ')[5:8])
+            if line_split(' ')[8] != '-':
+                status=line_split(' ')[8]
+            if line_split(' ')[9] != '-' and \
+            line_split(' ')[9] != '"-"' and line_split(' ')[9] != '"-"\n' :
+                size_in_bytes=int(line_split(' ')[9])
             else:
-                size_in_bytes=line.split(' ')[9]
+                size_in_bytes=line_split(' ')[9]
         else:
-            request=line.split(' ')[5]
-            status=line.split(' ')[6]
-            size_in_bytes=int(line.split(' ')[7])
+            request=line_split(' ')[5]
+            status=line_split(' ')[6]
+            size_in_bytes=int(line_split(' ')[7])
 
         logs_dictionary={
             'ip_address':ip_address,

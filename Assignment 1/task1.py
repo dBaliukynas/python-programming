@@ -198,7 +198,7 @@ def main():
 
     with open(args.filename, 'r') as log_file:
         if not os.path.getsize(args.filename):
-            print(f'File \"{args.filename.split("/").pop()}\" cannot be empty')
+            print(f'File \"{args.filename.split("/").pop()}\" cannot be empty.')
             sys.exit()
         log_list=parse_log_file(log_file)
         log_list_len=len(log_list)

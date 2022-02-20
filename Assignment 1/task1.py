@@ -4,7 +4,8 @@ import argparse
 import os
 import sys
 
-def print_group_value (group, order):
+
+def print_group_value(group, order):
     '''Print group value.
 
     Parameters
@@ -21,17 +22,17 @@ def print_group_value (group, order):
         Equal symbols to dynamically shift table.
     '''
     order_value_digit_count = len(str(group[order]))
-    
-    if (order == 'count'):
+
+    if order == 'count':
         order_name = 'COUNT'
-    elif (order == 'count_p'):
+    elif order == 'count_p':
         order_name = 'COUNT PERCENTAGE'
     else:
         order_name = 'TOTAL BYTES'
-        
+
     order_name_digit_count = len(order_name)
-    
-    if (order_value_digit_count > order_name_digit_count):
+
+    if order_value_digit_count > order_name_digit_count:
         digit_count = order_value_digit_count
     else:
         digit_count = order_name_digit_count
@@ -42,7 +43,7 @@ def print_group_value (group, order):
 | {group[order]}{'%' if order == 'count_p' else ''}{' ' * (digit_count 
                 - order_value_digit_count - 1 if order == 'count_p' 
                 else digit_count - order_value_digit_count) 
-                if digit_count == order_name_digit_count else ''} |
+                } |
 +--{'-' * digit_count}+''')
 
 
@@ -66,13 +67,14 @@ def print_sorted_groups(sorted_groups, order, limit_number):
         for sorted_log in group['logs']:
 
             if limit_number is not None and limit_index == int(limit_number):
-                print_group_value (group, order)
+                print_group_value(group, order)
                 sys.exit()
 
             print(f'{sorted_log}\n')
-            limit_index +=1
+            limit_index += 1
 
-        print_group_value (group, order)
+        print_group_value(group, order)
+
 
 def count_group_values(log_groups, log_list_len, order):
     '''Count grouped logs values.
@@ -91,10 +93,9 @@ def count_group_values(log_groups, log_list_len, order):
         and its values (count, count_p or total_bytes).
     '''
     for group in log_groups.values():
-
         total_bytes = 0
 
-        if order in ('count','count_p'):
+        if order in ('count', 'count_p'):
             count = len(group['logs'])
             group['count'] = count
 
@@ -106,10 +107,11 @@ def count_group_values(log_groups, log_list_len, order):
                 if log['size_in_bytes'] != '-' and log['size_in_bytes'] != '"-"\n':
                     total_bytes += (log['size_in_bytes'])
             group['total_bytes'] = total_bytes
-            
+
     return log_groups
 
-def group_logs(log_list, group, order):
+
+def group_logs(log_list, group):
     '''Group logs by IP address or HTTP status code.
 
     Parameters
@@ -125,14 +127,15 @@ def group_logs(log_list, group, order):
     '''
     log_groups = {}
 
-    for log in log_list:     
+    for log in log_list:
         if log[group] in log_groups:
             log_groups[log[group]]['logs'].append(log)
-                
+
         else:
             log_groups[log[group]] = {'logs': [log]}
 
     return log_groups
+
 
 def parse_log_file(log_file):
     '''Parse log file.
@@ -161,7 +164,7 @@ def parse_log_file(log_file):
             if line_split[8] != '-':
                 status = line_split[8]
             if line_split[9] != '-' and \
-            line_split[9] != '"-"' and line_split[9] != '"-"\n' :
+                    line_split[9] != '"-"' and line_split[9] != '"-"\n':
                 size_in_bytes = int(line_split[9])
             else:
                 size_in_bytes = line_split[9]
@@ -171,54 +174,59 @@ def parse_log_file(log_file):
             size_in_bytes = int(line_split[7])
 
         logs_dictionary = {
-            'ip_address':ip_address,
-            'client_identity':client_identity,
-            'auth_user':auth_user,
-            'date':date,
-            'request':request,
-            'status':status,
-            'size_in_bytes':size_in_bytes,
-            }
+            'ip_address': ip_address,
+            'client_identity': client_identity,
+            'auth_user': auth_user,
+            'date': date,
+            'request': request,
+            'status': status,
+            'size_in_bytes': size_in_bytes,
+        }
         log_list.append(logs_dictionary)
 
     return log_list
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Parse Common Log Format file, '\
-                                     'group logs by IP address or HTTP status code ' \
-                                     'and print sorted (by count, count percentage '\
+    parser = argparse.ArgumentParser(description='Parse Common Log Format file, '
+                                     'group logs by IP address or HTTP status code '
+                                     'and print sorted (by count, count percentage '
                                      'or total bytes of group) grouped logs.')
-    parser.add_argument('filename', help='A name of a non empty, CML format file')
-    parser.add_argument('group', choices=['ip', 'status'], help='Grouping logs by '\
+    parser.add_argument(
+        'filename', help='A name of a non empty, CML format file')
+    parser.add_argument('group', choices=['ip', 'status'], help='Grouping logs by '
                         'IP address or HTTP status code')
     parser.add_argument('order', choices=['count', 'count_p', 'bytes'],
-                        help='Grouped logs will be ordered by their count, '\
-                        'count percentage of all logged requests (count_p) '\
+                        help='Grouped logs will be ordered by their count, '
+                        'count percentage of all logged requests (count_p) '
                         'or by total number of bytes transferred (bytes)')
-    parser.add_argument('-limit','-l', help='Amount of rows to print')
+    parser.add_argument('-limit', '-l', help='Amount of rows to print')
     args = parser.parse_args()
 
     with open(args.filename, 'r') as log_file:
         if not os.path.getsize(args.filename):
-            print(f'File \"{args.filename.split("/").pop()}\" cannot be empty.')
+            print(
+                f'File \"{args.filename.split("/").pop()}\" cannot be empty.')
             sys.exit()
-            
-        if (args.order == 'bytes'):
+
+        if args.order == 'bytes':
             args.order = 'total_bytes'
-        if (args.group == 'ip'):
+        if args.group == 'ip':
             args.group = 'ip_address'
-            
-        log_list=parse_log_file(log_file)
+
+        log_list = parse_log_file(log_file)
         log_list_len = len(log_list)
-        
-        log_groups = count_group_values(group_logs(log_list, args.group, args.order),
-                                      log_list_len, args.order)
-        
+
+        log_groups = count_group_values(group_logs(log_list, args.group),
+                                        log_list_len, args.order)
+
         sorted_groups = dict(sorted(log_groups.items(),
-                                    key=lambda item: (item[1][args.order], item[0]),
+                                    key=lambda item: (
+                                        item[1][args.order], item[0]),
                                     reverse=True))
 
         print_sorted_groups(sorted_groups, args.order, args.limit)
+
 
 if __name__ == '__main__':
     main()

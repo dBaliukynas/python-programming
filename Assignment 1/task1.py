@@ -4,13 +4,12 @@ import argparse
 import os
 import sys
 
-def print_group_value (group, order, space_symbols,
-                               dash_symbols, equal_symbols):
+def print_group_value (group, order):
     '''Print group value.
 
     Parameters
     ----------
-    sorted_group : dictionary
+    group : dictionary
         Dictionary of group logs and its values (count, count_p or bytes)
     order: string
         Group value by which groups are being ordered.
@@ -21,24 +20,28 @@ def print_group_value (group, order, space_symbols,
     equal_symbols: string
         Equal symbols to dynamically shift table.
     '''
-    if order == 'bytes':
-        print(f'''+------------{dash_symbols}+
-| TOTAL BYTES{space_symbols}|
-+============{ equal_symbols}+
-| {group['total_bytes']}           |
-+------------{dash_symbols}+''')
-    elif order == 'count':
-        print(f'''+------{dash_symbols}+
-| COUNT{space_symbols}|
-+======{ equal_symbols}+
-| {group['count']}     |
-+------{dash_symbols}+''')
+    order_value_digit_count = len(str(group[order]))
+    
+    if (order == 'count'):
+        order_name = 'COUNT'
+    elif (order == 'count_p'):
+        order_name = 'COUNT PERCENTAGE'
     else:
-        print(f'''+-----------------{dash_symbols}+
-| COUNT PERCENTAGE{space_symbols}|
-+================={ equal_symbols}+
-| {group['count_p']}%               |
-+-----------------{dash_symbols}+''')
+        order_name = 'TOTAL BYTES'
+        
+    order_name_digit_count = len(order_name)
+    
+    if (order_value_digit_count > order_name_digit_count):
+        digit_count = order_value_digit_count
+    else:
+        digit_count = order_name_digit_count
+
+    print(f'''+--{'-' * digit_count}+
+| {order_name}{' ' * (digit_count - order_name_digit_count )} |
++=={'=' * digit_count}+
+| {group[order]}{' ' * (digit_count - order_value_digit_count) 
+                 if digit_count == order_name_digit_count else ''} |
++--{'-' * digit_count}+''')
 
 
 def print_sorted_groups(sorted_groups, order, limit_number):
@@ -53,16 +56,6 @@ def print_sorted_groups(sorted_groups, order, limit_number):
     '''
     limit_index = 0
     for group_key, group in sorted_groups.items():
-        if order == 'bytes':
-            digit_count = len(str(group['total_bytes']))
-        elif order == 'count':
-            digit_count = len(str(group['count']))
-        else:
-            digit_count = len(str(group['count_p']))
-
-        space_symbols=' ' * digit_count
-        dash_symbols='-'  * digit_count
-        equal_symbols='=' * digit_count
 
         if limit_number is not None and limit_index == int(limit_number):
             sys.exit()
@@ -71,15 +64,13 @@ def print_sorted_groups(sorted_groups, order, limit_number):
         for sorted_log in group['logs']:
 
             if limit_number is not None and limit_index == int(limit_number):
-                print_group_value (group, order, space_symbols,
-                                               dash_symbols, equal_symbols)
+                print_group_value (group, order)
                 sys.exit()
 
             print(f'{sorted_log}\n')
             limit_index +=1
 
-        print_group_value (group, order, space_symbols,
-                                       dash_symbols, equal_symbols)
+        print_group_value (group, order)
 
 def count_group_values(log_groups, log_list_len, order):
     '''Count grouped logs values.
@@ -108,11 +99,12 @@ def count_group_values(log_groups, log_list_len, order):
             if order == 'count_p':
                 group['count_p'] = (group['count'] / log_list_len) * 100
 
-        elif order == 'bytes':
+        elif order == 'total_bytes':
             for log in group['logs']:
                 if log['size_in_bytes'] != '-' and log['size_in_bytes'] != '"-"\n':
                     total_bytes += (log['size_in_bytes'])
             group['total_bytes'] = total_bytes
+            
     return log_groups
 
 def group_logs(log_list, group, order):
@@ -131,30 +123,12 @@ def group_logs(log_list, group, order):
     '''
     log_groups = {}
 
-    for log in log_list:
-        if group == 'ip':
-
-            if log['ip_address'] in log_groups:
-                log_groups[log['ip_address']]['logs'].append(log)
-            else:
-                log_groups[log['ip_address']] = {'logs': [log]}
-                if order == 'bytes':
-                    log_groups[log['ip_address']].setdefault("total_bytes", 0)
-                elif order in ('count', 'count_p'):
-                    log_groups[log['ip_address']].setdefault("count", 0)
-                else:
-                    log_groups[log['ip_address']].setdefault("count_p", 0)
+    for log in log_list:     
+        if log[group] in log_groups:
+            log_groups[log[group]]['logs'].append(log)
+                
         else:
-            if log['status'] in log_groups:
-                log_groups[log['status']]['logs'].append(log)
-            else:
-                log_groups[log['status']] = {'logs': [log]}
-                if order == 'bytes':
-                    log_groups[log['status']].setdefault("total_bytes", 0)
-                elif order in ('count', 'count_p'):
-                    log_groups[log['status']].setdefault("count", 0)
-                else:
-                    log_groups[log['status']].setdefault("count_p", 0)
+            log_groups[log[group]] = {'logs': [log]}
 
     return log_groups
 
@@ -226,19 +200,21 @@ def main():
         if not os.path.getsize(args.filename):
             print(f'File \"{args.filename.split("/").pop()}\" cannot be empty.')
             sys.exit()
+            
+        if (args.order == 'bytes'):
+            args.order = 'total_bytes'
+        if (args.group == 'ip'):
+            args.group = 'ip_address'
+            
         log_list=parse_log_file(log_file)
         log_list_len = len(log_list)
-
+        
         log_groups = count_group_values(group_logs(log_list, args.group, args.order),
                                       log_list_len, args.order)
-        if args.order != 'bytes':
-            sorted_groups = dict(sorted(log_groups.items(),
-                                        key=lambda item: (item[1]['count'], item[0]),
-                                        reverse=True))
-        else:
-            sorted_groups = dict(sorted(log_groups.items(),
-                                        key=lambda item: (item[1]['total_bytes'], item[0]),
-                                        reverse=True))
+        
+        sorted_groups = dict(sorted(log_groups.items(),
+                                    key=lambda item: (item[1][args.order], item[0]),
+                                    reverse=True))
 
         print_sorted_groups(sorted_groups, args.order, args.limit)
 

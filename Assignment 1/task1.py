@@ -4,14 +4,14 @@ import argparse
 import os
 import sys
 
-def print_group_value (sorted_group, order, space_symbols,
+def print_group_value (group, order, space_symbols,
                                dash_symbols, equal_symbols):
     '''Print group value.
 
     Parameters
     ----------
     sorted_group : dictionary
-        Dictionary of sorted group
+        Dictionary of group logs and its values (count, count_p or bytes)
     order: string
         Group value by which groups are being ordered.
     space_symbols: string
@@ -25,19 +25,19 @@ def print_group_value (sorted_group, order, space_symbols,
         print(f'''+------------{dash_symbols}+
 | TOTAL BYTES{space_symbols}|
 +============{ equal_symbols}+
-| {sorted_group['total_bytes']}           |
+| {group['total_bytes']}           |
 +------------{dash_symbols}+''')
     elif order == 'count':
         print(f'''+------{dash_symbols}+
 | COUNT{space_symbols}|
 +======{ equal_symbols}+
-| {sorted_group['count']}     |
+| {group['count']}     |
 +------{dash_symbols}+''')
     else:
         print(f'''+-----------------{dash_symbols}+
 | COUNT PERCENTAGE{space_symbols}|
 +================={ equal_symbols}+
-| {sorted_group['count_p']}%               |
+| {group['count_p']}%               |
 +-----------------{dash_symbols}+''')
 
 
@@ -52,13 +52,13 @@ def print_sorted_groups(sorted_groups, order, limit_number):
         Amount of rows to print.
     '''
     limit_index = 0
-    for group_key, sorted_group in sorted_groups.items():
+    for group_key, group in sorted_groups.items():
         if order == 'bytes':
-            digit_count = len(str(sorted_group['total_bytes']))
+            digit_count = len(str(group['total_bytes']))
         elif order == 'count':
-            digit_count = len(str(sorted_group['count']))
+            digit_count = len(str(group['count']))
         else:
-            digit_count = len(str(sorted_group['count_p']))
+            digit_count = len(str(group['count_p']))
 
         space_symbols=' ' * digit_count
         dash_symbols='-'  * digit_count
@@ -68,17 +68,17 @@ def print_sorted_groups(sorted_groups, order, limit_number):
             sys.exit()
         print(f'\n{group_key}:')
 
-        for sorted_log in sorted_group['logs']:
+        for sorted_log in group['logs']:
 
             if limit_number is not None and limit_index == int(limit_number):
-                print_group_value (sorted_group, order, space_symbols,
+                print_group_value (group, order, space_symbols,
                                                dash_symbols, equal_symbols)
                 sys.exit()
 
             print(f'{sorted_log}\n')
             limit_index +=1
 
-        print_group_value (sorted_group, order, space_symbols,
+        print_group_value (group, order, space_symbols,
                                        dash_symbols, equal_symbols)
 
 def count_group_values(log_groups, log_list_len, order):

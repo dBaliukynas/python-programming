@@ -39,8 +39,10 @@ def print_group_value (group, order):
     print(f'''+--{'-' * digit_count}+
 | {order_name}{' ' * (digit_count - order_name_digit_count )} |
 +=={'=' * digit_count}+
-| {group[order]}{' ' * (digit_count - order_value_digit_count) 
-                 if digit_count == order_name_digit_count else ''} |
+| {group[order]}{'%' if order == 'count_p' else ''}{' ' * (digit_count 
+                - order_value_digit_count - 1 if order == 'count_p' 
+                else digit_count - order_value_digit_count) 
+                if digit_count == order_name_digit_count else ''} |
 +--{'-' * digit_count}+''')
 
 

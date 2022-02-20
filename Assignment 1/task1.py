@@ -4,6 +4,43 @@ import argparse
 import os
 import sys
 
+def print_group_value (sorted_group, order, space_symbols,
+                               dash_symbols, equal_symbols):
+    '''Print group value.
+
+    Parameters
+    ----------
+    sorted_group : dictionary
+        Dictionary of sorted group
+    order: string
+        Group value by which groups are being ordered.
+    space_symbols: string
+        Space symbols to dynamically shift table.
+    dash_symbols: string
+        Dash symbols to dynamically shift table.
+    equal_symbols: string
+        Equal symbols to dynamically shift table.
+    '''
+    if order == 'bytes':
+        print(f'''+------------{dash_symbols}+
+| TOTAL BYTES{space_symbols}|
++============{ equal_symbols}+
+| {sorted_group['total_bytes']}           |
++------------{dash_symbols}+''')
+    elif order == 'count':
+        print(f'''+------{dash_symbols}+
+| COUNT{space_symbols}|
++======{ equal_symbols}+
+| {sorted_group['count']}     |
++------{dash_symbols}+''')
+    else:
+        print(f'''+-----------------{dash_symbols}+
+| COUNT PERCENTAGE{space_symbols}|
++================={ equal_symbols}+
+| {sorted_group['count_p']}%               |
++-----------------{dash_symbols}+''')
+
+
 def print_sorted_groups(sorted_groups, order, limit_number):
     '''Print sorted log groups.
 
@@ -15,49 +52,34 @@ def print_sorted_groups(sorted_groups, order, limit_number):
         Amount of rows to print.
     '''
     limit_index = 0
-    for group_key, sorted_logs in sorted_groups.items():
-        if limit_number is not None and limit_index == int(limit_number):
-            sys.exit()
-        print(f'\n{group_key}:')
-
-        for sorted_log in (sorted_logs['logs']):
-            # print(sorted_logs['logs'])
-            # print(sorted(sorted_logs['logs']), key=lambda item: item['ip_address'], reverse=True)
-            if limit_number is not None and limit_index == int(limit_number):
-                sys.exit()
-
-            print(f'{sorted_log}\n')
-            limit_index +=1
-
+    for group_key, sorted_group in sorted_groups.items():
         if order == 'bytes':
-            digit_count = len(str(sorted_logs['total_bytes']))
+            digit_count = len(str(sorted_group['total_bytes']))
         elif order == 'count':
-            digit_count = len(str(sorted_logs['count']))
+            digit_count = len(str(sorted_group['count']))
         else:
-            digit_count = len(str(sorted_logs['count_p']))
+            digit_count = len(str(sorted_group['count_p']))
 
         space_symbols=' ' * digit_count
         dash_symbols='-'  * digit_count
         equal_symbols='=' * digit_count
 
-        if order == 'bytes':
-            print(f'''+------------{dash_symbols}+
-| TOTAL BYTES{space_symbols}|
-+============{ equal_symbols}+
-| {sorted_logs['total_bytes']}           |
-+------------{dash_symbols}+''')
-        elif order == 'count':
-            print(f'''+------{dash_symbols}+
-| COUNT{space_symbols}|
-+======{ equal_symbols}+
-| {sorted_logs['count']}     |
-+------{dash_symbols}+''')
-        else:
-            print(f'''+-----------------{dash_symbols}+
-| COUNT PERCENTAGE{space_symbols}|
-+================={ equal_symbols}+
-| {sorted_logs['count_p']}%               |
-+-----------------{dash_symbols}+''')
+        if limit_number is not None and limit_index == int(limit_number):
+            sys.exit()
+        print(f'\n{group_key}:')
+
+        for sorted_log in sorted_group['logs']:
+
+            if limit_number is not None and limit_index == int(limit_number):
+                print_group_value (sorted_group, order, space_symbols,
+                                               dash_symbols, equal_symbols)
+                sys.exit()
+
+            print(f'{sorted_log}\n')
+            limit_index +=1
+
+        print_group_value (sorted_group, order, space_symbols,
+                                       dash_symbols, equal_symbols)
 
 def count_group_values(log_groups, log_list_len, order):
     '''Count grouped logs values.
@@ -76,7 +98,6 @@ def count_group_values(log_groups, log_list_len, order):
         and its values (count, count_p or total_bytes).
     '''
     for group in log_groups.values():
-
 
         total_bytes = 0
 
@@ -108,7 +129,7 @@ def group_logs(log_list, group, order):
         Dictionary of logs grouped by IP address or HTTP status code.
 
     '''
-    log_groups={}
+    log_groups = {}
 
     for log in log_list:
         if group == 'ip':
@@ -151,7 +172,7 @@ def parse_log_file(log_file):
         List of log dictionaries.
 
     '''
-    log_list=[]
+    log_list = []
     for line in log_file:
         line_split = line.split(' ')
 
@@ -210,9 +231,14 @@ def main():
 
         log_groups = count_group_values(group_logs(log_list, args.group, args.order),
                                       log_list_len, args.order)
-        sorted_groups = dict(sorted(log_groups.items(),
-                                    key=lambda item: (item[1]['count'], item[0]),
-                                    reverse=True))
+        if args.order != 'bytes':
+            sorted_groups = dict(sorted(log_groups.items(),
+                                        key=lambda item: (item[1]['count'], item[0]),
+                                        reverse=True))
+        else:
+            sorted_groups = dict(sorted(log_groups.items(),
+                                        key=lambda item: (item[1]['total_bytes'], item[0]),
+                                        reverse=True))
 
         print_sorted_groups(sorted_groups, args.order, args.limit)
 

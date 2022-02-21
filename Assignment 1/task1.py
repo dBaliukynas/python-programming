@@ -5,7 +5,7 @@ import os
 import sys
 
 
-def print_group_value(group, order):
+def print_order_value(group, order):
     '''Print group value.
 
     Parameters
@@ -31,19 +31,26 @@ def print_group_value(group, order):
         order_name = 'TOTAL BYTES'
 
     order_name_digit_count = len(order_name)
+    percent_symbol = ''
 
     if order_value_digit_count > order_name_digit_count:
         digit_count = order_value_digit_count
+
+        if order == 'count_p':
+            percent_symbol = '%'
+            digit_count +=1
+            order_value_digit_count +=1
+
     else:
+        if order == 'count_p':
+            percent_symbol = '%'
+            order_value_digit_count += 1
         digit_count = order_name_digit_count
 
     print(f'''+--{'-' * digit_count}+
 | {order_name}{' ' * (digit_count - order_name_digit_count )} |
 +=={'=' * digit_count}+
-| {group[order]}{'%' if order == 'count_p' else ''}{' ' * (digit_count 
-                - order_value_digit_count - 1 if order == 'count_p' 
-                else digit_count - order_value_digit_count) 
-                } |
+| {group[order]}{percent_symbol}{' ' * (digit_count - order_value_digit_count)} |
 +--{'-' * digit_count}+''')
 
 
@@ -67,16 +74,16 @@ def print_sorted_groups(sorted_groups, order, limit_number):
         for sorted_log in group['logs']:
 
             if limit_number is not None and limit_index == int(limit_number):
-                print_group_value(group, order)
+                print_order_value(group, order)
                 sys.exit()
 
             print(f'{sorted_log}\n')
             limit_index += 1
 
-        print_group_value(group, order)
+        print_order_value(group, order)
 
 
-def count_group_values(log_groups, log_list_len, order):
+def count_order_values(log_groups, log_list_len, order):
     '''Count grouped logs values.
 
     Parameters
@@ -137,7 +144,7 @@ def group_logs(log_list, group):
     return log_groups
 
 
-def parse_log_file(log_file):
+def parse_log_file(log_file, filename):
     '''Parse log file.
 
     Parameters
@@ -153,38 +160,43 @@ def parse_log_file(log_file):
     '''
     log_list = []
     for line in log_file:
-        line_split = line.split(' ')
+        try:
 
-        ip_address = line_split[0]
-        client_identity = line_split[1]
-        auth_user = line_split[2]
-        date = ' '.join(line_split[3:5])
-        if line_split[5] != '"-"' and line_split[5] != '-':
-            request = ' '.join(line_split[5:8])
-            if line_split[8] != '-':
-                status = line_split[8]
-            if line_split[9] != '-' and \
-                    line_split[9] != '"-"' and line_split[9] != '"-"\n':
-                size_in_bytes = int(line_split[9])
+            line_split = line.split(' ')
+
+            ip_address = line_split[0]
+            client_identity = line_split[1]
+            auth_user = line_split[2]
+            date = ' '.join(line_split[3:5])
+            if line_split[5] != '"-"' and line_split[5] != '-':
+                request = ' '.join(line_split[5:8])
+                if line_split[8] != '-':
+                    status = line_split[8]
+                if (line_split[9] != '-'
+                    and line_split[9] != '"-"'
+                    and line_split[9] != '"-"\n'):
+                    size_in_bytes = int(line_split[9])
+                else:
+                    size_in_bytes = line_split[9]
             else:
-                size_in_bytes = line_split[9]
-        else:
-            request = line_split[5]
-            status = line_split[6]
-            size_in_bytes = int(line_split[7])
+                request = line_split[5]
+                status = line_split[6]
+                size_in_bytes = int(line_split[7])
 
-        logs_dictionary = {
-            'ip_address': ip_address,
-            'client_identity': client_identity,
-            'auth_user': auth_user,
-            'date': date,
-            'request': request,
-            'status': status,
-            'size_in_bytes': size_in_bytes,
-        }
-        log_list.append(logs_dictionary)
+            logs_dictionary = {
+                'ip_address': ip_address,
+                'client_identity': client_identity,
+                'auth_user': auth_user,
+                'date': date,
+                'request': request,
+                'status': status,
+                'size_in_bytes': size_in_bytes,
+            }
+            log_list.append(logs_dictionary)
+        except (ValueError, IndexError):
+            print(f'File "{filename}" is not a Common Log Format file.')
 
-    return log_list
+        return log_list
 
 
 def main():
@@ -202,11 +214,12 @@ def main():
                         'or by total number of bytes transferred (bytes)')
     parser.add_argument('-limit', '-l', help='Amount of rows to print')
     args = parser.parse_args()
+    filename = args.filename.split('/').pop()
 
     with open(args.filename, 'r') as log_file:
         if not os.path.getsize(args.filename):
             print(
-                f'File \"{args.filename.split("/").pop()}\" cannot be empty.')
+                f'File "{filename}" cannot be empty.')
             sys.exit()
 
         if args.order == 'bytes':
@@ -214,10 +227,10 @@ def main():
         if args.group == 'ip':
             args.group = 'ip_address'
 
-        log_list = parse_log_file(log_file)
+        log_list = parse_log_file(log_file, filename)
         log_list_len = len(log_list)
 
-        log_groups = count_group_values(group_logs(log_list, args.group),
+        log_groups = count_order_values(group_logs(log_list, args.group),
                                         log_list_len, args.order)
 
         sorted_groups = dict(sorted(log_groups.items(),

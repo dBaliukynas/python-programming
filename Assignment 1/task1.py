@@ -33,7 +33,7 @@ def print_order_value(group, order):
     order_name_digit_count = len(order_name)
     percent_symbol = ''
 
-    if order_value_digit_count > order_name_digit_count:
+    if order_value_digit_count >= order_name_digit_count:
         digit_count = order_value_digit_count
 
         if order == 'count_p':
@@ -158,12 +158,12 @@ def parse_log_file(log_file, filename):
         List of log dictionaries.
 
     '''
-    log_list = []
-    for line in log_file:
-        try:
-
+    try:
+        log_list = []
+        for line in log_file:
+    
             line_split = line.split(' ')
-
+    
             ip_address = line_split[0]
             client_identity = line_split[1]
             auth_user = line_split[2]
@@ -182,7 +182,7 @@ def parse_log_file(log_file, filename):
                 request = line_split[5]
                 status = line_split[6]
                 size_in_bytes = int(line_split[7])
-
+    
             logs_dictionary = {
                 'ip_address': ip_address,
                 'client_identity': client_identity,
@@ -193,10 +193,12 @@ def parse_log_file(log_file, filename):
                 'size_in_bytes': size_in_bytes,
             }
             log_list.append(logs_dictionary)
-        except (ValueError, IndexError):
-            print(f'File "{filename}" is not a Common Log Format file.')
+        
 
         return log_list
+    except (ValueError, IndexError):
+        print(f'File "{filename}" is not a Common Log Format file.')
+        sys.exit()
 
 
 def main():

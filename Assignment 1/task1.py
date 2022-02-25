@@ -112,6 +112,7 @@ def count_order_values(log_groups, log_list_len, order):
         elif order == 'total_bytes':
             for log in group['logs']:
                 if log['size_in_bytes'] != '-' and log['size_in_bytes'] != '"-"\n':
+                    print(log['size_in_bytes'])
                     total_bytes += (log['size_in_bytes'])
             group['total_bytes'] = total_bytes
 
@@ -184,7 +185,7 @@ def parse_log_file(log_file, filename):
                 if (tokens[index_after_date + 4] != '-'
                     and tokens[index_after_date + 4] != '"-"'
                         and tokens[index_after_date + 4] != '"-"\n'):
-                    size_in_bytes = tokens[index_after_date + 4]
+                    size_in_bytes = int(tokens[index_after_date + 4])
                 else:
                     size_in_bytes = tokens[index_after_date + 4]
             else:
@@ -205,7 +206,6 @@ def parse_log_file(log_file, filename):
 
         return log_list
     except (ValueError, IndexError):
-        pass
         print(f'File "{filename}" is not a Common Log Format file.')
         sys.exit()
 

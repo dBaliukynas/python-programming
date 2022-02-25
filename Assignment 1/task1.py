@@ -112,7 +112,6 @@ def count_order_values(log_groups, log_list_len, order):
         elif order == 'total_bytes':
             for log in group['logs']:
                 if log['size_in_bytes'] != '-' and log['size_in_bytes'] != '"-"\n':
-                    print(log['size_in_bytes'])
                     total_bytes += (log['size_in_bytes'])
             group['total_bytes'] = total_bytes
 

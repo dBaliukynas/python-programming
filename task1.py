@@ -38,8 +38,8 @@ def print_order_value(group, order):
 
         if order == 'count_p':
             percent_symbol = '%'
-            digit_count +=1
-            order_value_digit_count +=1
+            digit_count += 1
+            order_value_digit_count += 1
 
     else:
         if order == 'count_p':
@@ -68,14 +68,14 @@ def print_sorted_groups(sorted_groups, order, limit_number):
     for group_key, group in sorted_groups.items():
 
         if limit_number is not None and limit_index == int(limit_number):
-            sys.exit()
+            return
         print(f'\n{group_key}:')
 
         for sorted_log in group['logs']:
 
             if limit_number is not None and limit_index == int(limit_number):
                 print_order_value(group, order)
-                sys.exit()
+                return
 
             print(f'{sorted_log}\n')
             limit_index += 1
@@ -111,7 +111,7 @@ def count_order_values(log_groups, log_list_len, order):
 
         elif order == 'total_bytes':
             for log in group['logs']:
-                if log['size_in_bytes'] != '-' and log['size_in_bytes'] != '"-"\n':
+                if log['size_in_bytes'] not in ('-', '"-"\n'):
                     total_bytes += (log['size_in_bytes'])
             group['total_bytes'] = total_bytes
 
@@ -161,28 +161,41 @@ def parse_log_file(log_file, filename):
     try:
         log_list = []
         for line in log_file:
-    
-            line_split = line.split(' ')
-    
-            ip_address = line_split[0]
-            client_identity = line_split[1]
-            auth_user = line_split[2]
-            date = ' '.join(line_split[3:5])
-            if line_split[5] != '"-"' and line_split[5] != '-':
-                request = ' '.join(line_split[5:8])
-                if line_split[8] != '-':
-                    status = line_split[8]
-                if (line_split[9] != '-'
-                    and line_split[9] != '"-"'
-                    and line_split[9] != '"-"\n'):
-                    size_in_bytes = int(line_split[9])
+
+            tokens = line.split(' ')
+
+            ip_address = tokens[0]
+            client_identity = tokens[1]
+            auth_user = tokens[2]
+            date = tokens[3]
+            for token in tokens[4:]:
+
+                date += ' ' + token
+
+                if ']' in token:
+                    index_after_date = tokens.index(token) + 1
+                    break
+
+            if tokens[index_after_date] not in ('"-"', '-'):
+                request = ' '.join(
+                    tokens[index_after_date:index_after_date + 3])
+
+                status = tokens[index_after_date + 3]
+
+                if tokens[index_after_date + 4].isnumeric():
+                    size_in_bytes = int(tokens[index_after_date + 4])
                 else:
-                    size_in_bytes = line_split[9]
+                    size_in_bytes = '-'
+
             else:
-                request = line_split[5]
-                status = line_split[6]
-                size_in_bytes = int(line_split[7])
-    
+                request = tokens[index_after_date]
+                status = tokens[index_after_date + 1]
+
+                if tokens[index_after_date + 2].isnumeric():
+                    size_in_bytes = int(tokens[index_after_date + 2])
+                else:
+                    size_in_bytes = tokens[index_after_date + 2]
+
             logs_dictionary = {
                 'ip_address': ip_address,
                 'client_identity': client_identity,
@@ -193,7 +206,6 @@ def parse_log_file(log_file, filename):
                 'size_in_bytes': size_in_bytes,
             }
             log_list.append(logs_dictionary)
-        
 
         return log_list
     except (ValueError, IndexError):
@@ -214,33 +226,38 @@ def main():
                         help='Grouped logs will be ordered by their count, '
                         'count percentage of all logged requests (count_p) '
                         'or by total number of bytes transferred (bytes)')
-    parser.add_argument('-limit', '-l', help='Amount of rows to print')
+    parser.add_argument('--limit', '-l', help='Amount of rows to print')
     args = parser.parse_args()
     filename = args.filename.split('/').pop()
 
-    with open(args.filename, 'r') as log_file:
-        if not os.path.getsize(args.filename):
-            print(
-                f'File "{filename}" cannot be empty.')
-            sys.exit()
+    try:
+        with open(args.filename, 'r') as log_file:
+            if not os.path.getsize(args.filename):
+                print(
+                    f'File "{filename}" cannot be empty.')
+                sys.exit()
 
-        if args.order == 'bytes':
-            args.order = 'total_bytes'
-        if args.group == 'ip':
-            args.group = 'ip_address'
+            if args.order == 'bytes':
+                args.order = 'total_bytes'
+            if args.group == 'ip':
+                args.group = 'ip_address'
 
-        log_list = parse_log_file(log_file, filename)
-        log_list_len = len(log_list)
+            log_list = parse_log_file(log_file, filename)
+            log_list_len = len(log_list)
 
-        log_groups = count_order_values(group_logs(log_list, args.group),
-                                        log_list_len, args.order)
+            log_groups = count_order_values(group_logs(log_list, args.group),
+                                            log_list_len, args.order)
 
-        sorted_groups = dict(sorted(log_groups.items(),
-                                    key=lambda item: (
-                                        item[1][args.order], item[0]),
-                                    reverse=True))
+            sorted_groups = dict(sorted(log_groups.items(),
+                                        key=lambda item: (
+                                            item[1][args.order], item[0]),
+                                        reverse=True))
+            print(log_groups.items())
 
-        print_sorted_groups(sorted_groups, args.order, args.limit)
+            print_sorted_groups(sorted_groups, args.order, args.limit)
+    except FileNotFoundError:
+        print(f'File "{filename}" does not exist.')
+        sys.exit()
 
 
 if __name__ == '__main__':

@@ -252,7 +252,6 @@ def main():
                                         key=lambda item: (
                                             item[1][args.order], item[0]),
                                         reverse=True))
-            print(log_groups.items())
 
             print_sorted_groups(sorted_groups, args.order, args.limit)
     except FileNotFoundError:

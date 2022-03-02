@@ -54,7 +54,7 @@ def print_order_value(group, order):
 +--{'-' * digit_count}+''')
 
 
-def print_sorted_groups(sorted_groups, order, limit_number):
+def print_sorted_groups(sorted_groups, order, log_list_len, limit_number):
     '''Print sorted log groups.
 
     Parameters
@@ -68,6 +68,7 @@ def print_sorted_groups(sorted_groups, order, limit_number):
     for group_key, group in sorted_groups.items():
 
         if limit_number is not None and limit_index == int(limit_number):
+            print(f'CURRENTLY SHOWING {limit_index} logs out of {log_list_len}')
             return
         print(f'\n{group_key}:')
 
@@ -75,12 +76,16 @@ def print_sorted_groups(sorted_groups, order, limit_number):
 
             if limit_number is not None and limit_index == int(limit_number):
                 print_order_value(group, order)
+                print(f'CURRENTLY SHOWING {limit_index} logs out of {log_list_len}')
                 return
 
             print(f'{sorted_log}\n')
             limit_index += 1
 
         print_order_value(group, order)
+        if limit_index == log_list_len:
+            print(f'CURRENTLY SHOWING {limit_index} logs')
+
 
 
 def count_order_values(log_groups, log_list_len, order):
@@ -99,8 +104,10 @@ def count_order_values(log_groups, log_list_len, order):
         Dictionary of logs grouped by IP address or HTTP status code
         and its values (count, count_p or total_bytes).
     '''
+    group_count = 0
     for group in log_groups.values():
         total_bytes = 0
+        group_count += 1
 
         if order in ('count', 'count_p'):
             count = len(group['logs'])
@@ -111,10 +118,10 @@ def count_order_values(log_groups, log_list_len, order):
 
         elif order == 'total_bytes':
             for log in group['logs']:
-                if log['size_in_bytes'] != '-' and log['size_in_bytes'] != '"-"\n':
+                if log['size_in_bytes'] not in ('-', '"-"\n'):
                     total_bytes += (log['size_in_bytes'])
             group['total_bytes'] = total_bytes
-
+    print(group_count)
     return log_groups
 
 
@@ -176,21 +183,25 @@ def parse_log_file(log_file, filename):
                     index_after_date = tokens.index(token) + 1
                     break
 
-            if tokens[index_after_date] != '"-"' and tokens[index_after_date] != '-':
+            if tokens[index_after_date] not in ('"-"', '-'):
                 request = ' '.join(
                     tokens[index_after_date:index_after_date + 3])
-                if tokens[index_after_date + 3] != '-':
-                    status = tokens[index_after_date + 3]
-                if (tokens[index_after_date + 4] != '-'
-                    and tokens[index_after_date + 4] != '"-"'
-                        and tokens[index_after_date + 4] != '"-"\n'):
+
+                status = tokens[index_after_date + 3]
+
+                if tokens[index_after_date + 4].isnumeric():
                     size_in_bytes = int(tokens[index_after_date + 4])
                 else:
-                    size_in_bytes = tokens[index_after_date + 4]
+                    size_in_bytes = '-'
+
             else:
-                request = tokens[5]
-                status = tokens[6]
-                size_in_bytes = tokens[7]
+                request = tokens[index_after_date]
+                status = tokens[index_after_date + 1]
+
+                if tokens[index_after_date + 2].isnumeric():
+                    size_in_bytes = int(tokens[index_after_date + 2])
+                else:
+                    size_in_bytes = tokens[index_after_date + 2]
 
             logs_dictionary = {
                 'ip_address': ip_address,
@@ -222,33 +233,38 @@ def main():
                         help='Grouped logs will be ordered by their count, '
                         'count percentage of all logged requests (count_p) '
                         'or by total number of bytes transferred (bytes)')
-    parser.add_argument('-limit', '-l', help='Amount of rows to print')
+    parser.add_argument('--limit', '-l', help='Amount of rows to print')
     args = parser.parse_args()
     filename = args.filename.split('/').pop()
 
-    with open(args.filename, 'r') as log_file:
-        if not os.path.getsize(args.filename):
-            print(
-                f'File "{filename}" cannot be empty.')
-            sys.exit()
+    try:
+        with open(args.filename, 'r') as log_file:
+            if not os.path.getsize(args.filename):
+                print(
+                    f'File "{filename}" cannot be empty.')
+                sys.exit()
 
-        if args.order == 'bytes':
-            args.order = 'total_bytes'
-        if args.group == 'ip':
-            args.group = 'ip_address'
+            if args.order == 'bytes':
+                args.order = 'total_bytes'
+            if args.group == 'ip':
+                args.group = 'ip_address'
 
-        log_list = parse_log_file(log_file, filename)
-        log_list_len = len(log_list)
+            log_list = parse_log_file(log_file, filename)
+            log_list_len = len(log_list)
 
-        log_groups = count_order_values(group_logs(log_list, args.group),
-                                        log_list_len, args.order)
+            log_groups = count_order_values(group_logs(log_list, args.group),
+                                            log_list_len, args.order)
 
-        sorted_groups = dict(sorted(log_groups.items(),
-                                    key=lambda item: (
-                                        item[1][args.order], item[0]),
-                                    reverse=True))
+            sorted_groups = dict(sorted(log_groups.items(),
+                                        key=lambda item: (
+                                            item[1][args.order], item[0]),
+                                        reverse=True))
 
-        print_sorted_groups(sorted_groups, args.order, args.limit)
+            print_sorted_groups(sorted_groups, args.order,
+                                log_list_len, args.limit)
+    except FileNotFoundError:
+        print(f'File "{filename}" does not exist.')
+        sys.exit()
 
 
 if __name__ == '__main__':

@@ -54,7 +54,7 @@ def print_order_value(group, order):
 +--{'-' * digit_count}+''')
 
 
-def print_sorted_groups(sorted_groups, order, log_list_len, limit_number):
+def print_sorted_groups(sorted_groups, order, log_list_len, limit_number, no_logs):
     '''Print sorted log groups.
 
     Parameters
@@ -64,27 +64,44 @@ def print_sorted_groups(sorted_groups, order, log_list_len, limit_number):
     limit_number: string / None
         Amount of rows to print.
     '''
-    limit_index = 0
-    for group_key, group in sorted_groups.items():
 
-        if limit_number is not None and limit_index == int(limit_number):
-            print(f'CURRENTLY SHOWING {limit_index} logs out of {log_list_len}')
+    if limit_number is not None:
+        limit_number = int(limit_number)
+
+    limit_index = 0
+    group_count = len(sorted_groups.keys())
+    
+    for index, (group_key, group) in enumerate(sorted_groups.items()):
+        print(index)
+
+        if limit_number is not None and limit_index == limit_number:
+            if not no_logs:
+                print(f'SHOWING {limit_index} logs out of {log_list_len}')
+            print(f'SHOWING {index} keys out ofs {group_count}')
             return
         print(f'\n{group_key}:')
 
-        for sorted_log in group['logs']:
+        if not no_logs:
+            for sorted_log in group['logs']:
 
-            if limit_number is not None and limit_index == int(limit_number):
-                print_order_value(group, order)
-                print(f'CURRENTLY SHOWING {limit_index} logs out of {log_list_len}')
-                return
+                if limit_number is not None and limit_index == limit_number:
+                    print_order_value(group, order)
+                    print(f'SHOWING {limit_index} logs out of {log_list_len}')
+                    print(f'SHOWING {index + 1} keys out of {group_count}')
+                    return
 
-            print(f'{sorted_log}\n')
+                print(f'{sorted_log}\n')
+                limit_index += 1
+
+            print_order_value(group, order)
+            if limit_index == log_list_len:
+                print(f'SHOWING {limit_index} logs')
+                print(f'SHOWING {index + 1} keys')
+        else:
+            print_order_value(group, order)
             limit_index += 1
-
-        print_order_value(group, order)
-        if limit_index == log_list_len:
-            print(f'CURRENTLY SHOWING {limit_index} logs')
+            if index + 1 == group_count:
+                print(f'SHOWING {index + 1} keys')
 
 
 
@@ -104,10 +121,8 @@ def count_order_values(log_groups, log_list_len, order):
         Dictionary of logs grouped by IP address or HTTP status code
         and its values (count, count_p or total_bytes).
     '''
-    group_count = 0
     for group in log_groups.values():
         total_bytes = 0
-        group_count += 1
 
         if order in ('count', 'count_p'):
             count = len(group['logs'])
@@ -121,7 +136,6 @@ def count_order_values(log_groups, log_list_len, order):
                 if log['size_in_bytes'] not in ('-', '"-"\n'):
                     total_bytes += (log['size_in_bytes'])
             group['total_bytes'] = total_bytes
-    print(group_count)
     return log_groups
 
 
@@ -234,6 +248,7 @@ def main():
                         'count percentage of all logged requests (count_p) '
                         'or by total number of bytes transferred (bytes)')
     parser.add_argument('--limit', '-l', help='Amount of rows to print')
+    parser.add_argument('--no_logs', '-nl', help='Print only keys but not logs themselves', action='store_true')
     args = parser.parse_args()
     filename = args.filename.split('/').pop()
 
@@ -261,7 +276,7 @@ def main():
                                         reverse=True))
 
             print_sorted_groups(sorted_groups, args.order,
-                                log_list_len, args.limit)
+                                log_list_len, args.limit, args.no_logs)
     except FileNotFoundError:
         print(f'File "{filename}" does not exist.')
         sys.exit()

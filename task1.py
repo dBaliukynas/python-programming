@@ -72,12 +72,11 @@ def print_sorted_groups(sorted_groups, order, log_list_len, limit_number, no_log
     group_count = len(sorted_groups.keys())
     
     for index, (group_key, group) in enumerate(sorted_groups.items()):
-        print(index)
 
         if limit_number is not None and limit_index == limit_number:
             if not no_logs:
                 print(f'SHOWING {limit_index} logs out of {log_list_len}')
-            print(f'SHOWING {index} keys out ofs {group_count}')
+            print(f'SHOWING {index} groups out of {group_count}')
             return
         print(f'\n{group_key}:')
 
@@ -87,7 +86,7 @@ def print_sorted_groups(sorted_groups, order, log_list_len, limit_number, no_log
                 if limit_number is not None and limit_index == limit_number:
                     print_order_value(group, order)
                     print(f'SHOWING {limit_index} logs out of {log_list_len}')
-                    print(f'SHOWING {index + 1} keys out of {group_count}')
+                    print(f'SHOWING {index + 1} groups out of {group_count}')
                     return
 
                 print(f'{sorted_log}\n')
@@ -96,12 +95,12 @@ def print_sorted_groups(sorted_groups, order, log_list_len, limit_number, no_log
             print_order_value(group, order)
             if limit_index == log_list_len:
                 print(f'SHOWING {limit_index} logs')
-                print(f'SHOWING {index + 1} keys')
+                print(f'SHOWING {index + 1} groups')
         else:
             print_order_value(group, order)
             limit_index += 1
             if index + 1 == group_count:
-                print(f'SHOWING {index + 1} keys')
+                print(f'SHOWING {index + 1} groups')
 
 
 

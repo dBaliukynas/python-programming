@@ -1,3 +1,15 @@
+class Season:
+    
+    def __init__(self, name):
+        self.name = name
+        self.teams = {}
+        
+    def add_team(self, team):
+        self.teams[team.name] = team
+    
+    
+        
+
 class Game:
     '''
     A class that represents EuroLeague's game.
@@ -9,7 +21,7 @@ class Game:
     -------
 
     '''
-    def __init__(self, name, _round, season):
+    def __init__(self, name, _round, season, team1, team2):
         '''
         Parameters
         ----------
@@ -24,6 +36,8 @@ class Game:
         self.name = name
         self.round = _round
         self.season = season
+        self.team1 = team1
+        self.team2 = team2
 
 
 class Team:
@@ -51,11 +65,51 @@ class Team:
             Team's position in season's leaderboard
 
         '''
-
+        
+        self.players = {}
         self.name = name
         self.wins = wins
         self.losses= losses
         self.leaderboard_position= leaderboard_position
+
+
+    def add_player(self, player):
+        self.players[player.fullname] = player
+    def find_win_percentage(self):
+        return round(self.wins / (self.wins + self.losses) * 100, 2)
+
+
+class GamePerformance:
+    '''
+    A class that represents EuroLeague's team's performance in a game.
+
+    ...
+
+
+    Methods
+    -------
+
+    '''
+    def __init__(self, team, performance_index_rating,
+                 points, two_point_percent):
+        '''
+        Parameters
+        ----------
+        team : object
+            Team.
+        performance_index_rating : int
+            Team's wins in season.
+        index_rating : int
+            Team's losses in season.
+        two_point_percent : float
+            Team's position in season's leaderboard
+
+        '''
+
+        self.team = team
+        self.performance_index_rating = performance_index_rating
+        self.points = points
+        self.two_point_percent = two_point_percent
 
 class Player:
     '''
@@ -68,7 +122,7 @@ class Player:
     -------
 
     '''
-    def __init__(self, name, surname, team, position):
+    def __init__(self, name, surname, position):
         '''
         Parameters
         ----------
@@ -76,16 +130,21 @@ class Player:
             Player's name.
         surname : str
             Player's surname.
-        team : str
-            Team's losses in season.
-        leaderboard_position : int
-            Team's position in season's leaderboard
+        position : str
+            Player's position, i.e. Guard, Forward, etc.
 
-        '''
-        
+        '''    
+
         self.name = name
         self.surname = surname
-        self.team = team
         self.position = position
+        self.fullname = name + ' ' + surname
 
-Game1 = Game("Zenit St Petersburg vs Panathinaikos OPAP Athens", 29, "2021-22")
+Season1=Season('2021-22')
+Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
+Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
+Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 'Guard'))
+Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 'Guard'))
+# Season1.teams[0].add_player(Player('Tyson', 'Carter', 'Guard'))
+# Season1.teams[0].add_player(Player('Tyson', 'Carter', 'Guard'))
+print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].position)

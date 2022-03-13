@@ -1,3 +1,5 @@
+import sys
+
 class Season:
 
     def __init__(self, name):
@@ -20,7 +22,7 @@ class Game:
     -------
 
     '''
-    def __init__(self, name, _round, team1, team2):
+    def __init__(self, name, _round, team1_performance, team2_performance):
         '''
         Parameters
         ----------
@@ -32,8 +34,22 @@ class Game:
 
         self.name = name
         self.round = _round
-        self.team1 = team1
-        self.team2 = team2
+        self.team1_performance = team1_performance
+        self.team2_performance = team2_performance
+        
+    def find_performance_difference(self):
+        team_performance_difference = {self.team1_performance.team.name: {}}
+        team_performance_attributes =  ([attribute for attribute in (dir(self.team1_performance)) 
+         if not attribute.startswith('__') and not attribute.endswith('__') 
+                                           and attribute != 'team'])
+        for team_performance_attribute in team_performance_attributes:
+            team1_attribute = getattr(self.team1_performance, team_performance_attribute)
+            team2_attribute = getattr(self.team2_performance, team_performance_attribute)
+            team_performance_difference[self.team1_performance.team.name].update(
+            {team_performance_attribute : round(team1_attribute - team2_attribute, 2)})
+            
+        return team_performance_difference
+            
 
 
 class Team:
@@ -92,8 +108,9 @@ class Team:
                                key=lambda item: item[1], reverse=True))
         except AttributeError:
             print(f'No such attribute as "{val}"')
+            sys.exit()
     
-    def find_furthest_number_player(self):
+    def find_furthest_number_players(self):
 
         number_diff = []
         sorted_players = (sorted(self.players.items(), key=lambda item: item[1].number))
@@ -115,7 +132,7 @@ class Team:
 
                 
 
-class GamePerformance:
+class TeamPerformance:
     '''
     A class that represents EuroLeague's team's performance in a game.
 
@@ -126,8 +143,9 @@ class GamePerformance:
     -------
 
     '''
-    def __init__(self, team, performance_index_rating,
-                 points, two_point_percent):
+    def __init__(self, team, performance_index_rating, points, two_point_percent,
+                 three_point_percent, free_throw_percent, offensive_rebounds,
+                 defensive_rebounds, assists, steals, blocks, turnovers):
         '''
         Parameters
         ----------
@@ -146,6 +164,14 @@ class GamePerformance:
         self.performance_index_rating = performance_index_rating
         self.points = points
         self.two_point_percent = two_point_percent
+        self.three_point_percent = three_point_percent
+        self.free_throw_percent = free_throw_percent
+        self.offensive_rebounds = offensive_rebounds
+        self.defensive_rebounds = defensive_rebounds
+        self.assists = assists
+        self.steals = steals
+        self.blocks = blocks
+        self.turnovers = turnovers
 
 class Player:
     '''
@@ -186,28 +212,41 @@ class Player:
         self.blocks = blocks
         self.performance_index_rating = performance_index_rating
 
-Season1=Season('2021-22')
+Season1 = Season('2021-22')
 Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
 Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
 Season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
+Season1.add_team(Team('FC Barcelona', 21, 6, 1))
 Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
-                                                       1.0, 0.5, 1.2, 0.5, 0.0,
-                                                       0.2))
+                                                        1.0, 0.5, 1.2, 0.5, 0.0,
+                                                        0.2))
 Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
-                                                       13.2, 4.0, 3.9, 1.0, 0.1,
-                                                       14.4))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 0, 'Germany',
-                                                   'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
+                                                        13.2, 4.0, 3.9, 1.0, 0.1,
+                                                        14.4))
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
+                                                    'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
                                                     4.7))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 44, 'Lithuania',
-                                                   'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 12, 'Lithuania',
+                                                    'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
                                                     0.9))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 22, 'New Zealand',
-                                                   'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 2, 'New Zealand',
+                                                    'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
                                                     2.8))
 
-print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].__dict__)
-print(f'{Season1.teams["Zenit St Petersburg"].name} : '\
-      f'{Season1.teams["Zenit St Petersburg"].count_players_value("position")}')
-print(Season1.teams['Zalgiris Kaunas'].count_players_value('nationality'))
-print(Season1.teams['Zalgiris Kaunas'].find_furthest_number_player())
+# =============================================================================
+# print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].__dict__)
+# print(f'{Season1.teams["Zenit St Petersburg"].name} : '\
+#       f'{Season1.teams["Zenit St Petersburg"].count_players_value("position")}')
+# print(Season1.teams['Zalgiris Kaunas'].count_players_value('nationality'))
+# print(Season1.teams['Zalgiris Kaunas'].find_furthest_number_players())
+# =============================================================================
+
+Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
+             TeamPerformance(Season1.teams['Zalgiris Kaunas'], 108, 91, 44.2, 42.9,
+                             85.4, 11, 17, 13, 13, 5, 12),
+             TeamPerformance(Season1.teams['FC Barcelona'], 71, 84, 53.8, 40.0,
+                             87.0, 11, 23, 20, 1, 0, 22 ))
+# print(Game1.team1_performance.__dict__)
+print('\n')
+print(Game1.find_performance_difference())
+

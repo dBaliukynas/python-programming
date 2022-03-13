@@ -73,30 +73,47 @@ class Team:
         self.players[player.fullname] = player
 
     def find_win_percentage(self):
-        return round(self.wins / (self.wins + self.losses) * 100, 2)
+        return round(self.wins / (self.wins + self.losses) * 100, 4)
 
-    def count_players_positions(self):
-        guard_count = 0
-        forward_count = 0
-        center_count = 0
-        coach_count = 0
-        for player in self.players.values():
-            if player.position == 'Guard':
-                guard_count += 1
-            elif player.position == 'Forward':
-                forward_count += 1
-            elif player.position == 'Center':
-                center_count += 1
+
+    def count_players_value(self, val):
+        try:
+            players_values = {}
+            for player in self.players.values():
+                    
+                value = getattr(player, val) 
+                 
+                if value in players_values:
+                    players_values[value] += 1
+                else:
+                    players_values[value] = 1
+                    
+            return dict(sorted(players_values.items(), 
+                               key=lambda item: item[1], reverse=True))
+        except AttributeError:
+            print(f'No such attribute as "{val}"')
+    
+    def find_furthest_number_player(self):
+
+        number_diff = []
+        sorted_players = (sorted(self.players.items(), key=lambda item: item[1].number))
+       
+        for index in range(len(sorted_players)):
+            if index == 0 and len(sorted_players) != 1:
+                number_diff.append(sorted_players[index + 1][1].number - sorted_players[index][1].number)
+            elif index < len(sorted_players) - 1:
+                
+                number_diff.append(min(sorted_players[index + 1][1].number - sorted_players[index][1].number, 
+                          sorted_players[index][1].number - sorted_players[index - 1][1].number))
             else:
-                coach_count += 1
+                number_diff.append((sorted_players[index][1].number - sorted_players[index - 1][1].number))
+    
+        
+     
+        return dict(sorted_players[0:len([index for index, number in
+                                       enumerate(number_diff) if number == max(number_diff)])])
 
-        return {
-            'Guard': guard_count,
-            'Forward': forward_count,
-            'Center': center_count,
-            'Coach': coach_count
-            }
-
+                
 
 class GamePerformance:
     '''
@@ -141,7 +158,7 @@ class Player:
     -------
 
     '''
-    def __init__(self, name, surname, position,
+    def __init__(self, name, surname, number, nationality, position,
                  points, rebounds, assists, steals, blocks,
                  performance_index_rating):
         '''
@@ -159,6 +176,8 @@ class Player:
         self.name = name
         self.surname = surname
         self.fullname = name + ' ' + surname
+        self.number = number
+        self.nationality = nationality
         self.position = position
         self.points = points
         self.rebounds = rebounds
@@ -170,13 +189,25 @@ class Player:
 Season1=Season('2021-22')
 Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
 Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 'Guard',
+Season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
+Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
                                                        1.0, 0.5, 1.2, 0.5, 0.0,
                                                        0.2))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 'Guard',
+Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
                                                        13.2, 4.0, 3.9, 1.0, 0.1,
                                                        14.4))
-# Season1.teams[0].add_player(Player('Tyson', 'Carter', 'Guard'))
-# Season1.teams[0].add_player(Player('Tyson', 'Carter', 'Guard'))
-print(Season1.teams['Zenit St Petersburg'].players['Jordan Loyd'].__dict__)
-print(Season1.teams['Zenit St Petersburg'].count_players_positions())
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 0, 'Germany',
+                                                   'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
+                                                    4.7))
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 44, 'Lithuania',
+                                                   'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
+                                                    0.9))
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 22, 'New Zealand',
+                                                   'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
+                                                    2.8))
+
+print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].__dict__)
+print(f'{Season1.teams["Zenit St Petersburg"].name} : '\
+      f'{Season1.teams["Zenit St Petersburg"].count_players_value("position")}')
+print(Season1.teams['Zalgiris Kaunas'].count_players_value('nationality'))
+print(Season1.teams['Zalgiris Kaunas'].find_furthest_number_player())

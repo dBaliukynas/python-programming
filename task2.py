@@ -1,14 +1,13 @@
 class Season:
-    
+
     def __init__(self, name):
         self.name = name
         self.teams = {}
-        
+
     def add_team(self, team):
         self.teams[team.name] = team
-    
-    
-        
+
+
 
 class Game:
     '''
@@ -21,7 +20,7 @@ class Game:
     -------
 
     '''
-    def __init__(self, name, _round, season, team1, team2):
+    def __init__(self, name, _round, team1, team2):
         '''
         Parameters
         ----------
@@ -29,13 +28,10 @@ class Game:
             Game's name.
         round : int
             Game's round in season.
-        season : str
-            The season in which the game happened.
         '''
 
         self.name = name
         self.round = _round
-        self.season = season
         self.team1 = team1
         self.team2 = team2
 
@@ -65,7 +61,7 @@ class Team:
             Team's position in season's leaderboard
 
         '''
-        
+
         self.players = {}
         self.name = name
         self.wins = wins
@@ -75,8 +71,31 @@ class Team:
 
     def add_player(self, player):
         self.players[player.fullname] = player
+
     def find_win_percentage(self):
         return round(self.wins / (self.wins + self.losses) * 100, 2)
+
+    def count_players_positions(self):
+        guard_count = 0
+        forward_count = 0
+        center_count = 0
+        coach_count = 0
+        for player in self.players.values():
+            if player.position == 'Guard':
+                guard_count += 1
+            elif player.position == 'Forward':
+                forward_count += 1
+            elif player.position == 'Center':
+                center_count += 1
+            else:
+                coach_count += 1
+
+        return {
+            'Guard': guard_count,
+            'Forward': forward_count,
+            'Center': center_count,
+            'Coach': coach_count
+            }
 
 
 class GamePerformance:
@@ -122,7 +141,9 @@ class Player:
     -------
 
     '''
-    def __init__(self, name, surname, position):
+    def __init__(self, name, surname, position,
+                 points, rebounds, assists, steals, blocks,
+                 performance_index_rating):
         '''
         Parameters
         ----------
@@ -133,18 +154,29 @@ class Player:
         position : str
             Player's position, i.e. Guard, Forward, etc.
 
-        '''    
+       '''
 
         self.name = name
         self.surname = surname
-        self.position = position
         self.fullname = name + ' ' + surname
+        self.position = position
+        self.points = points
+        self.rebounds = rebounds
+        self.assists = assists
+        self.steals = steals
+        self.blocks = blocks
+        self.performance_index_rating = performance_index_rating
 
 Season1=Season('2021-22')
 Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
 Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 'Guard'))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 'Guard'))
+Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 'Guard',
+                                                       1.0, 0.5, 1.2, 0.5, 0.0,
+                                                       0.2))
+Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 'Guard',
+                                                       13.2, 4.0, 3.9, 1.0, 0.1,
+                                                       14.4))
 # Season1.teams[0].add_player(Player('Tyson', 'Carter', 'Guard'))
 # Season1.teams[0].add_player(Player('Tyson', 'Carter', 'Guard'))
-print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].position)
+print(Season1.teams['Zenit St Petersburg'].players['Jordan Loyd'].__dict__)
+print(Season1.teams['Zenit St Petersburg'].count_players_positions())

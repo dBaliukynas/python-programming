@@ -37,18 +37,27 @@ class Game:
         self.team1_performance = team1_performance
         self.team2_performance = team2_performance
         
-    def find_performance_difference(self):
-        team_performance_difference = {self.team1_performance.team.name: {}}
+    def count_performance_difference(self):
+        team_performance_difference = {self.team1_performance.team: {}}
         team_performance_attributes =  ([attribute for attribute in (dir(self.team1_performance)) 
          if not attribute.startswith('__') and not attribute.endswith('__') 
                                            and attribute != 'team'])
         for team_performance_attribute in team_performance_attributes:
             team1_attribute = getattr(self.team1_performance, team_performance_attribute)
             team2_attribute = getattr(self.team2_performance, team_performance_attribute)
-            team_performance_difference[self.team1_performance.team.name].update(
+            
+                
+            team_performance_difference[self.team1_performance.team].update(
             {team_performance_attribute : round(team1_attribute - team2_attribute, 2)})
             
         return team_performance_difference
+    
+    def find_better_team_by_value(self, val):
+        team1_value = getattr(self.team1_performance, val)
+        team2_value = getattr(self.team2_performance, val)
+        if team1_value > team2_value:
+            return self.team1_performance.team
+        return self.team2_performance.team
             
 
 
@@ -248,5 +257,6 @@ Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29,
                              87.0, 11, 23, 20, 1, 0, 22 ))
 # print(Game1.team1_performance.__dict__)
 print('\n')
-print(Game1.find_performance_difference())
+# print(Game1.count_performance_difference())
+print(Game1.find_better_team_by_value('assists').name)
 

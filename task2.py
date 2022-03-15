@@ -8,6 +8,16 @@ class Season:
 
     def add_team(self, team):
         self.teams[team.name] = team
+        
+    def find_best_player_by_value(self, attribute):
+        best_players_in_team = []
+        for team in self.teams.values():
+            if len(team.players) == 0:
+                continue
+            best_players_in_team.append(team.find_best_player_by_value(attribute))
+            
+        return sorted(best_players_in_team, reverse=True,
+                      key=lambda item: getattr(list(item.values())[0], attribute))
 
 
 
@@ -43,8 +53,10 @@ class Game:
          if not attribute.startswith('__') and not attribute.endswith('__') 
                                            and attribute != 'team'])
         for team_performance_attribute in team_performance_attributes:
-            team1_attribute = getattr(self.team1_performance, team_performance_attribute)
-            team2_attribute = getattr(self.team2_performance, team_performance_attribute)
+            team1_attribute = getattr(self.team1_performance, 
+                                      team_performance_attribute)
+            team2_attribute = getattr(self.team2_performance, 
+                                      team_performance_attribute)
             
                 
             team_performance_difference[self.team1_performance.team].update(
@@ -52,12 +64,16 @@ class Game:
             
         return team_performance_difference
     
-    def find_better_team_by_value(self, val):
-        team1_value = getattr(self.team1_performance, val)
-        team2_value = getattr(self.team2_performance, val)
-        if team1_value > team2_value:
-            return self.team1_performance.team
-        return self.team2_performance.team
+    def find_better_team_by_value(self, attribute):
+        try:
+            team1_value = getattr(self.team1_performance, attribute)
+            team2_value = getattr(self.team2_performance, attribute)
+            if team1_value > team2_value:
+                return self.team1_performance.team
+            return self.team2_performance.team
+        except AttributeError:
+            print(f'No such attribute as "{attribute}".')
+            sys.exit()
             
 
 
@@ -91,7 +107,7 @@ class Team:
         self.name = name
         self.wins = wins
         self.losses= losses
-        self.leaderboard_position= leaderboard_position
+        self.leaderboard_position = leaderboard_position
 
 
     def add_player(self, player):
@@ -101,12 +117,15 @@ class Team:
         return round(self.wins / (self.wins + self.losses) * 100, 4)
 
 
-    def count_players_value(self, val):
+    def count_players_value(self, attribute):
         try:
+            if attribute not in ('name', 'surname', 'nationality', 'position'):
+                print(f'Attribute "{attribute}" is not supported.')
+                sys.exit()
             players_values = {}
             for player in self.players.values():
                     
-                value = getattr(player, val) 
+                value = getattr(player, attribute) 
                  
                 if value in players_values:
                     players_values[value] += 1
@@ -116,7 +135,7 @@ class Team:
             return dict(sorted(players_values.items(), 
                                key=lambda item: item[1], reverse=True))
         except AttributeError:
-            print(f'No such attribute as "{val}"')
+            print(f'No such attribute as "{attribute}".')
             sys.exit()
     
     def find_furthest_number_players(self):
@@ -138,6 +157,16 @@ class Team:
      
         return dict(sorted_players[0:len([index for index, number in
                                        enumerate(number_diff) if number == max(number_diff)])])
+    
+    def find_best_player_by_value(self, attribute):
+        sorted_players = sorted(self.players.items(), 
+                               key=lambda item: getattr(item[1], attribute), 
+                               reverse=True)
+        
+        best_value = getattr(sorted_players[0][1], attribute)
+   
+        return dict([sorted_player for sorted_player in sorted_players
+                if getattr(sorted_player[1], attribute) == best_value])
 
                 
 
@@ -235,20 +264,18 @@ Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA
 Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
                                                     'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
                                                     4.7))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 12, 'Lithuania',
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 1, 'Lithuania',
                                                     'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
                                                     0.9))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 2, 'New Zealand',
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Zealand',
                                                     'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
                                                     2.8))
 
-# =============================================================================
 # print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].__dict__)
 # print(f'{Season1.teams["Zenit St Petersburg"].name} : '\
-#       f'{Season1.teams["Zenit St Petersburg"].count_players_value("position")}')
+      # f'{Season1.teams["Zenit St Petersburg"].count_players_value("position")}')
 # print(Season1.teams['Zalgiris Kaunas'].count_players_value('nationality'))
 # print(Season1.teams['Zalgiris Kaunas'].find_furthest_number_players())
-# =============================================================================
 
 Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
              TeamPerformance(Season1.teams['Zalgiris Kaunas'], 108, 91, 44.2, 42.9,
@@ -258,5 +285,6 @@ Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29,
 # print(Game1.team1_performance.__dict__)
 print('\n')
 # print(Game1.count_performance_difference())
-print(Game1.find_better_team_by_value('assists').name)
+# print(Game1.find_better_team_by_value('assists'))
+# print(Season1.find_best_player_by_value('assists'))
 

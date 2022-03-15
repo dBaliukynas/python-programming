@@ -18,8 +18,21 @@ class Season:
             
         return sorted(best_players_in_team, reverse=True,
                       key=lambda item: getattr(list(item.values())[0], attribute))
-
-
+    
+    def find_highest_streak_team(self, attribute):
+        if attribute not in ('win_streak', 'loss_streak'):
+            print(f'''Attribute "{attribute}" is not supported. 
+Supported attributes: "win_streak", "loss_streak".''')
+            sys.exit()
+        
+        sorted_teams = sorted(self.teams.items(), reverse=True,
+                              key=lambda item: getattr(item[1], attribute))
+       
+        highest_streak = getattr(sorted_teams[0][1], attribute)
+        
+        return dict([sorted_team for sorted_team in sorted_teams
+          if getattr(sorted_team[1], attribute) == highest_streak])
+            
 
 class Game:
     '''
@@ -46,6 +59,20 @@ class Game:
         self.round = _round
         self.team1_performance = team1_performance
         self.team2_performance = team2_performance
+        
+        def add_streak(self):
+            if self.team1_performance.points > self.team2_performance.points:
+                self.team1_performance.team.win_streak += 1
+                self.team2_performance.team.win_streak = 0
+                self.team2_performance.team.loss_streak += 1
+                
+            else:
+                self.team2_performance.team.win_streak += 1
+                self.team1_performance.team.win_streak = 0
+                self.team1_performance.team.loss_streak += 1
+    
+        
+        add_streak(self)
         
     def count_performance_difference(self):
         team_performance_difference = {self.team1_performance.team: {}}
@@ -74,6 +101,7 @@ class Game:
         except AttributeError:
             print(f'No such attribute as "{attribute}".')
             sys.exit()
+        
             
 
 
@@ -106,6 +134,8 @@ class Team:
         self.players = {}
         self.name = name
         self.wins = wins
+        self.win_streak = 0
+        self.loss_streak = 0
         self.losses= losses
         self.leaderboard_position = leaderboard_position
 
@@ -120,7 +150,8 @@ class Team:
     def count_players_value(self, attribute):
         try:
             if attribute not in ('name', 'surname', 'nationality', 'position'):
-                print(f'Attribute "{attribute}" is not supported.')
+                print(f'''Attribute "{attribute}" is not supported. 
+Supported attributes: "name", "surname", "nationality", "position".''')
                 sys.exit()
             players_values = {}
             for player in self.players.values():
@@ -282,9 +313,14 @@ Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29,
                              85.4, 11, 17, 13, 13, 5, 12),
              TeamPerformance(Season1.teams['FC Barcelona'], 71, 84, 53.8, 40.0,
                              87.0, 11, 23, 20, 1, 0, 22 ))
+Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
+             TeamPerformance(Season1.teams['FC Barcelona'], 108, 91, 44.2, 42.9,
+                             85.4, 11, 17, 13, 13, 5, 12),
+             TeamPerformance(Season1.teams['Zenit St Petersburg'], 71, 84, 53.8, 40.0,
+                             87.0, 11, 23, 20, 1, 0, 22 ))
 # print(Game1.team1_performance.__dict__)
 print('\n')
 # print(Game1.count_performance_difference())
 # print(Game1.find_better_team_by_value('assists'))
 # print(Season1.find_best_player_by_value('assists'))
-
+print(Season1.find_highest_streak_team('win_streak'))

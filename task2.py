@@ -1,4 +1,5 @@
 import sys
+import json
 
 class Season:
 
@@ -9,6 +10,23 @@ class Season:
     def add_team(self, team):
         self.teams[team.name] = team
         
+    @classmethod
+    def from_json(cls, season_dict):
+        season = cls(season_dict['name'])
+        
+        
+        season.teams = {team['name']:Team.from_json(
+            team['players'],
+            team['name'],
+            team['wins'], 
+            team['losses'], 
+            team['leaderboard_position']
+            ) 
+             for team in season_dict['teams'].values()}
+            
+        return season
+        
+
     def find_best_player_by_value(self, attribute):
         best_players_in_team = []
         for team in self.teams.values():
@@ -134,10 +152,28 @@ class Team:
         self.players = {}
         self.name = name
         self.wins = wins
+        self.losses= losses
         self.win_streak = 0
         self.loss_streak = 0
-        self.losses= losses
         self.leaderboard_position = leaderboard_position
+        
+    @classmethod
+    def from_json(cls, players, name, wins, losses,
+                  leaderboard_position):
+        team = cls(name, wins, losses, leaderboard_position)
+        team.win_streak = 0
+        team.loss_streak = 0
+        
+        team.players = {player['name']:Player.from_json(
+            player['name'], 
+            player['surname'], player['number'],
+            player['nationality'], player['position'],
+            player['points'], player['rebounds'],
+            player['assists'], player['steals'],
+            player['blocks'], player['performance_index_rating']
+            )
+             for player in players.values()}
+        return team
 
 
     def add_player(self, player):
@@ -280,27 +316,38 @@ class Player:
         self.steals = steals
         self.blocks = blocks
         self.performance_index_rating = performance_index_rating
+        
+    @classmethod
+    def from_json(cls, name, surname, number, nationality, position,
+                  points, rebounds, assists, steals, blocks,
+                  performance_index_rating):
+        player = cls(name, surname, number, nationality, position,
+                      points, rebounds, assists, steals, blocks,
+                      performance_index_rating)
+        player.fullname = player.name + ' ' + surname
+        
+        return player
 
-Season1 = Season('2021-22')
-Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
-Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
-Season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
-Season1.add_team(Team('FC Barcelona', 21, 6, 1))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
-                                                        1.0, 0.5, 1.2, 0.5, 0.0,
-                                                        0.2))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
-                                                        13.2, 4.0, 3.9, 1.0, 0.1,
-                                                        14.4))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
-                                                    'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
-                                                    4.7))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 1, 'Lithuania',
-                                                    'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
-                                                    0.9))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Zealand',
-                                                    'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
-                                                    2.8))
+# Season1 = Season('2021-22')
+# Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
+# Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
+# Season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
+# Season1.add_team(Team('FC Barcelona', 21, 6, 1))
+# Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
+#                                                         1.0, 0.5, 1.2, 0.5, 0.0,
+#                                                         0.2))
+# Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
+#                                                         13.2, 4.0, 3.9, 1.0, 0.1,
+#                                                         14.4))
+# Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
+#                                                     'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
+#                                                     4.7))
+# Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 1, 'Lithuania',
+#                                                     'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
+#                                                     0.9))
+# Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Zealand',
+#                                                     'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
+#                                                     2.8))
 
 # print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].__dict__)
 # print(f'{Season1.teams["Zenit St Petersburg"].name} : '\
@@ -308,19 +355,41 @@ Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Ze
 # print(Season1.teams['Zalgiris Kaunas'].count_players_value('nationality'))
 # print(Season1.teams['Zalgiris Kaunas'].find_furthest_number_players())
 
-Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
-             TeamPerformance(Season1.teams['Zalgiris Kaunas'], 108, 91, 44.2, 42.9,
-                             85.4, 11, 17, 13, 13, 5, 12),
-             TeamPerformance(Season1.teams['FC Barcelona'], 71, 84, 53.8, 40.0,
-                             87.0, 11, 23, 20, 1, 0, 22 ))
-Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
-             TeamPerformance(Season1.teams['FC Barcelona'], 108, 91, 44.2, 42.9,
-                             85.4, 11, 17, 13, 13, 5, 12),
-             TeamPerformance(Season1.teams['Zenit St Petersburg'], 71, 84, 53.8, 40.0,
-                             87.0, 11, 23, 20, 1, 0, 22 ))
+# =============================================================================
+# Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
+#              TeamPerformance(Season1.teams['Zalgiris Kaunas'], 108, 91, 44.2, 42.9,
+#                              85.4, 11, 17, 13, 13, 5, 12),
+#              TeamPerformance(Season1.teams['FC Barcelona'], 71, 84, 53.8, 40.0,
+#                              87.0, 11, 23, 20, 1, 0, 22 ))
+# Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
+#              TeamPerformance(Season1.teams['FC Barcelona'], 108, 91, 44.2, 42.9,
+#                              85.4, 11, 17, 13, 13, 5, 12),
+#              TeamPerformance(Season1.teams['Zenit St Petersburg'], 71, 84, 53.8, 40.0,
+#                              87.0, 11, 23, 20, 1, 0, 22 ))
+# =============================================================================
 # print(Game1.team1_performance.__dict__)
 print('\n')
 # print(Game1.count_performance_difference())
 # print(Game1.find_better_team_by_value('assists'))
 # print(Season1.find_best_player_by_value('assists'))
-print(Season1.find_highest_streak_team('win_streak'))
+# print(Season1.find_highest_streak_team('win_streak'))
+def object_decoder(obj):
+  
+    return Season(obj)
+
+
+    
+# with open('instances.txt', 'w') as file:
+#     json.dump(Season1, file, default=lambda x: x.__dict__)
+    
+# print(instances['Season1'])
+with open('instances.txt') as file:
+    season1 = json.load(file)
+# season1 = Season.from_json(season1)
+# Sea = Season(**test)
+# Season.from_json(test)
+# print(Sea.teams)
+season1 = Season.from_json(season1)
+print(season1)
+
+

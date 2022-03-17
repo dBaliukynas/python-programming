@@ -6,6 +6,7 @@ class Season:
     def __init__(self, name):
         self.name = name
         self.teams = {}
+        self.games = {}
 
     def add_team(self, team):
         self.teams[team.name] = team
@@ -15,14 +16,8 @@ class Season:
         season = cls(season_dict['name'])
         
         
-        season.teams = {team['name']:Team.from_json(
-            team['players'],
-            team['name'],
-            team['wins'], 
-            team['losses'], 
-            team['leaderboard_position']
-            ) 
-             for team in season_dict['teams'].values()}
+        season.teams = {team['name']:Team.from_json(team) 
+                        for team in season_dict['teams'].values()}
             
         return season
         
@@ -158,22 +153,15 @@ class Team:
         self.leaderboard_position = leaderboard_position
         
     @classmethod
-    def from_json(cls, players, name, wins, losses,
-                  leaderboard_position):
-        team = cls(name, wins, losses, leaderboard_position)
-        team.win_streak = 0
-        team.loss_streak = 0
+    def from_json(cls, team):
+        teams = cls(team['name'], team['wins'], team['losses'],
+                   team['leaderboard_position'])
+        teams.win_streak = 0
+        teams.loss_streak = 0
         
-        team.players = {player['name']:Player.from_json(
-            player['name'], 
-            player['surname'], player['number'],
-            player['nationality'], player['position'],
-            player['points'], player['rebounds'],
-            player['assists'], player['steals'],
-            player['blocks'], player['performance_index_rating']
-            )
-             for player in players.values()}
-        return team
+        teams.players = {player['fullname']:Player.from_json(player)
+             for player in team['players'].values()}
+        return teams
 
 
     def add_player(self, player):
@@ -318,36 +306,35 @@ class Player:
         self.performance_index_rating = performance_index_rating
         
     @classmethod
-    def from_json(cls, name, surname, number, nationality, position,
-                  points, rebounds, assists, steals, blocks,
-                  performance_index_rating):
-        player = cls(name, surname, number, nationality, position,
-                      points, rebounds, assists, steals, blocks,
-                      performance_index_rating)
-        player.fullname = player.name + ' ' + surname
+    def from_json(cls, player):
+        player = cls(player['name'], player['surname'], player['number'],
+                     player['nationality'], player['position'], player['points'],
+                     player['rebounds'], player['assists'], player['steals'],
+                     player['blocks'], player['performance_index_rating'])
+        player.fullname = player.name + player.surname
         
         return player
 
-# Season1 = Season('2021-22')
-# Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
-# Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
-# Season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
-# Season1.add_team(Team('FC Barcelona', 21, 6, 1))
-# Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
-#                                                         1.0, 0.5, 1.2, 0.5, 0.0,
-#                                                         0.2))
-# Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
-#                                                         13.2, 4.0, 3.9, 1.0, 0.1,
-#                                                         14.4))
-# Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
-#                                                     'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
-#                                                     4.7))
-# Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 1, 'Lithuania',
-#                                                     'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
-#                                                     0.9))
-# Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Zealand',
-#                                                     'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
-#                                                     2.8))
+Season1 = Season('2021-22')
+Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
+Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
+Season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
+Season1.add_team(Team('FC Barcelona', 21, 6, 1))
+Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
+                                                        1.0, 0.5, 1.2, 0.5, 0.0,
+                                                        0.2))
+Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
+                                                        13.2, 4.0, 3.9, 1.0, 0.1,
+                                                        14.4))
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
+                                                    'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
+                                                    4.7))
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 1, 'Lithuania',
+                                                    'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
+                                                    0.9))
+Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Zealand',
+                                                    'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
+                                                    2.8))
 
 # print(Season1.teams['Zenit St Petersburg'].players['Tyson Carter'].__dict__)
 # print(f'{Season1.teams["Zenit St Petersburg"].name} : '\
@@ -378,7 +365,6 @@ def object_decoder(obj):
     return Season(obj)
 
 
-    
 # with open('instances.txt', 'w') as file:
 #     json.dump(Season1, file, default=lambda x: x.__dict__)
     
@@ -390,6 +376,6 @@ with open('instances.txt') as file:
 # Season.from_json(test)
 # print(Sea.teams)
 season1 = Season.from_json(season1)
-print(season1)
+print(season1.__dict__)
 
 

@@ -27,6 +27,12 @@ class Season:
         
 
     def find_best_player_by_value(self, attribute):
+        if attribute in ('name', 'surname', 'fullname', 'nationality', 'position'):
+            raise AttributeError( f'''Attribute "{attribute}" is not supported. 
+ Supported attributes: "number", "points", "rebounds", "assists", "steals",
+   "blocks", "performance_index_rating".''')
+           
+       
         best_players_in_team = {}
         for team in self.teams.values():
             if len(team.players) == 0:
@@ -36,22 +42,23 @@ class Season:
         sorted_best_players = sorted(best_players_in_team.items(), reverse=True,
                        key=lambda item: getattr(item[1], attribute))
         best_value = getattr(sorted_best_players[0][1], attribute)
-        return dict([sorted_best_player for sorted_best_player in sorted_best_players
-                    if getattr(sorted_best_player[1], attribute) == best_value])
+        return [sorted_best_player[1] for sorted_best_player in sorted_best_players
+                    if getattr(sorted_best_player[1], attribute) == best_value]
+        
     
     def find_highest_streak_team(self, attribute):
         if attribute not in ('win_streak', 'loss_streak'):
-            print(f'''Attribute "{attribute}" is not supported. 
+            raise AttributeError(f'''Attribute "{attribute}" is not supported. 
 Supported attributes: "win_streak", "loss_streak".''')
-            sys.exit()
+
         
         sorted_teams = sorted(self.teams.items(), reverse=True,
                               key=lambda item: getattr(item[1], attribute))
        
         highest_streak = getattr(sorted_teams[0][1], attribute)
         
-        return dict([sorted_team for sorted_team in sorted_teams
-          if getattr(sorted_team[1], attribute) == highest_streak])
+        return [sorted_team[1] for sorted_team in sorted_teams
+          if getattr(sorted_team[1], attribute) == highest_streak]
             
 
 class Game:
@@ -109,7 +116,9 @@ class Game:
         team_performance_difference = {self.team1_performance.team: {}}
         team_performance_attributes =  ([attribute for attribute in (dir(self.team1_performance)) 
          if not attribute.startswith('__') and not attribute.endswith('__') 
-                                           and attribute != 'team'])
+                                           and attribute not in ('team',
+                                                                 'from_json')])
+     
         for team_performance_attribute in team_performance_attributes:
             team1_attribute = getattr(self.team1_performance, 
                                       team_performance_attribute)
@@ -123,17 +132,13 @@ class Game:
         return team_performance_difference
     
     def find_better_team_by_value(self, attribute):
-        try:
-            team1_value = getattr(self.team1_performance, attribute)
-            team2_value = getattr(self.team2_performance, attribute)
-            if team1_value > team2_value:
-                return self.team1_performance.team
-            return self.team2_performance.team
-        except AttributeError:
-            print(f'No such attribute as "{attribute}".')
-            sys.exit()
-        
-            
+   
+        team1_value = getattr(self.team1_performance, attribute)
+        team2_value = getattr(self.team2_performance, attribute)
+        if team1_value > team2_value:
+            return self.team1_performance.team
+        return self.team2_performance.team
+       
 
 
 class Team:
@@ -177,9 +182,11 @@ class Team:
         team.win_streak = 0
         team.loss_streak = 0
         
-        team.players = {player.name + ' ' + player.surname:Player.from_json(player)
+        team.players = {player['name'] + ' ' + player['surname']:Player.from_json(player)
              for player in team_dict['players'].values()}
         return team
+    
+        
 
 
     def add_player(self, player):
@@ -190,26 +197,23 @@ class Team:
 
 
     def count_players_value(self, attribute):
-        try:
-            if attribute not in ('name', 'surname', 'nationality', 'position'):
-                print(f'''Attribute "{attribute}" is not supported. 
+        if attribute not in ('name', 'surname', 'nationality', 'position'):
+            print(f'''Attribute "{attribute}" is not supported. 
 Supported attributes: "name", "surname", "nationality", "position".''')
-                sys.exit()
-            players_values = {}
-            for player in self.players.values():
-                    
-                value = getattr(player, attribute) 
-                 
-                if value in players_values:
-                    players_values[value] += 1
-                else:
-                    players_values[value] = 1
-                    
-            return dict(sorted(players_values.items(), 
-                               key=lambda item: item[1], reverse=True))
-        except AttributeError:
-            print(f'No such attribute as "{attribute}".')
             sys.exit()
+        players_values = {}
+        for player in self.players.values():
+                
+            value = getattr(player, attribute) 
+             
+            if value in players_values:
+                players_values[value] += 1
+            else:
+                players_values[value] = 1
+                
+        return dict(sorted(players_values.items(), 
+                           key=lambda item: item[1], reverse=True))
+   
     
     def find_furthest_number_players(self):
 
@@ -283,6 +287,7 @@ class TeamPerformance:
         self.steals = steals
         self.blocks = blocks
         self.turnovers = turnovers
+        
     
     @classmethod
     def from_json(cls, team_performance_dict, season_teams):
@@ -302,6 +307,8 @@ class TeamPerformance:
                                team_performance_dict['turnovers'])
            
         return team_performance
+    
+    
 
 class Player:
     '''
@@ -352,24 +359,24 @@ class Player:
         
         return player
 
-Season1 = Season('2021-22')
-Season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
-Season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
-Season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
-Season1.add_team(Team('FC Barcelona', 21, 6, 1))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
+season1 = Season('2021-22')
+season1.add_team(Team('Zenit St Petersburg', 14, 9, 6))
+season1.add_team(Team('Panathinaikos OPAP Athens', 7, 19, 17))
+season1.add_team(Team('Zalgiris Kaunas', 7, 20, 18))
+season1.add_team(Team('FC Barcelona', 21, 6, 1))
+season1.teams['Zenit St Petersburg'].add_player(Player('Tyson', 'Carter', 1, 'USA', 'Guard',
                                                         1.0, 0.5, 1.2, 0.5, 0.0,
                                                         0.2))
-Season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
+season1.teams['Zenit St Petersburg'].add_player(Player('Jordan', 'Loyd', 2, 'USA', 'Guard',
                                                         13.2, 4.0, 3.9, 1.0, 0.1,
                                                         14.4))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
+season1.teams['Zalgiris Kaunas'].add_player(Player('Niels', 'Giffey', 3, 'Germany',
                                                     'Forward', 5.6, 2.6, 0.7, 0.5, 0.1,
                                                     4.7))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 1, 'Lithuania',
+season1.teams['Zalgiris Kaunas'].add_player(Player('Karolis', 'Lukosiunas', 1, 'Lithuania',
                                                     'Forward', 3.1, 0.8, 0.5, 0.3, 0.0,
                                                     0.9))
-Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Zealand',
+season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Zealand',
                                                     'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
                                                     2.8))
 
@@ -379,22 +386,21 @@ Season1.teams['Zalgiris Kaunas'].add_player(Player('Tai', 'Webster', 12, 'New Ze
 # print(Season1.teams['Zalgiris Kaunas'].count_players_value('nationality'))
 # print(Season1.teams['Zalgiris Kaunas'].find_furthest_number_players())
 
-Game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
-              TeamPerformance(Season1.teams['Zalgiris Kaunas'], 108, 91, 44.2, 42.9,
+game1 = Game('Zalgiris Kaunas vs FC Barcelona', 29, 
+              TeamPerformance(season1.teams['Zalgiris Kaunas'], 108, 91, 44.2, 42.9,
                               85.4, 11, 17, 13, 13, 5, 12),
-              TeamPerformance(Season1.teams['FC Barcelona'], 71, 84, 53.8, 40.0,
+              TeamPerformance(season1.teams['FC Barcelona'], 71, 84, 53.8, 40.0,
                               87.0, 11, 23, 20, 1, 0, 22 ))
-Game2 = Game('Zalgiris Kaunass vs FC Barcelona', 29, 
-              TeamPerformance(Season1.teams['FC Barcelona'], 108, 91, 44.2, 42.9,
+game2 = Game('Zalgiris Kaunass vs FC Barcelona', 29, 
+              TeamPerformance(season1.teams['FC Barcelona'], 108, 91, 44.2, 42.9,
                               85.4, 11, 17, 13, 13, 5, 12),
-              TeamPerformance(Season1.teams['Zenit St Petersburg'], 71, 84, 53.8, 40.0,
+              TeamPerformance(season1.teams['Zenit St Petersburg'], 71, 84, 53.8, 40.0,
                               87.0, 11, 23, 20, 1, 0, 22 ))
-Season1.add_game(Game1)
-Season1.add_game(Game2)
+season1.add_game(game1)
+season1.add_game(game2)
 # print(Game1.team1_performance.__dict__)
 print('\n')
-# print(Game1.count_performance_difference())
-# print(Game1.find_better_team_by_value('assists'))
+# print(game1.count_performance_difference())
 # print(Season1.find_best_player_by_value('assists'))
 # print(Season1.find_highest_streak_team('win_streak'))
 

@@ -2,8 +2,6 @@ import unittest
 import copy
 from tests import testdata
 from task2 import task2
-
-# print(testdata.season1.teams['Zalgiris Kaunas'].find_furthest_number_player()[0].__dict__)
     
 class TestSeason(unittest.TestCase):
     def test_find_best_player_by_value_one_player(self):
@@ -54,10 +52,12 @@ class TestGame(unittest.TestCase):
         
         new_season2 = copy.deepcopy(testdata.season2)
         task2.Game('Anadolu Efes Istanbul vs FC Barcelona', 29, 
-                      task2.TeamPerformance(new_season2.teams['Anadolu Efes Istanbul'], 108, 111, 44.2, 42.9,
-                                      85.4, 11, 17, 13, 13, 5, 12),
-                      task2.TeamPerformance(new_season2.teams['FC Barcelona'], 110, 94, 53.8, 40.0,
-                                      87.0, 11, 23, 20, 1, 0, 22 ))
+                      task2.TeamPerformance(new_season2.teams['Anadolu Efes Istanbul'],
+                                            108, 111, 44.2, 42.9,
+                                            85.4, 11, 17, 13, 13, 5, 12),
+                      task2.TeamPerformance(new_season2.teams['FC Barcelona'], 
+                                            110, 94, 53.8, 40.0,
+                                            87.0, 11, 23, 20, 1, 0, 22 ))
         
         new_team1_loss = new_season2.teams['FC Barcelona'].loss_streak
         new_team2_win = new_season2.teams['Anadolu Efes Istanbul'].win_streak
@@ -66,10 +66,12 @@ class TestGame(unittest.TestCase):
         self.assertEqual(new_team2_win, 1)
         
         task2.Game('Anadolu Efes Istanbul vs FC Barcelona', 29, 
-                      task2.TeamPerformance(new_season2.teams['Anadolu Efes Istanbul'], 108, 80, 44.2, 42.9,
-                                      85.4, 11, 17, 13, 13, 5, 12),
-                      task2.TeamPerformance(new_season2.teams['FC Barcelona'], 110, 94, 53.8, 40.0,
-                                      87.0, 11, 23, 20, 1, 0, 22 ))
+                      task2.TeamPerformance(new_season2.teams['Anadolu Efes Istanbul'],
+                                            108, 80, 44.2, 42.9,
+                                            85.4, 11, 17, 13, 13, 5, 12),
+                      task2.TeamPerformance(new_season2.teams['FC Barcelona'],
+                                            110, 94, 53.8, 40.0,
+                                            87.0, 11, 23, 20, 1, 0, 22 ))
         
         new_team1_loss = new_season2.teams['FC Barcelona'].loss_streak
         new_team2_win = new_season2.teams['Anadolu Efes Istanbul'].win_streak
@@ -109,7 +111,24 @@ class TestGame(unittest.TestCase):
             
 class TestTeam(unittest.TestCase):
     def test_find_furthest_number_player_one_player(self):
-        pass
+        result = testdata.season1.teams['Zalgiris Kaunas'] \
+            .find_furthest_number_player()[0]
+        self.assertEqual(result, testdata.season1.teams['Zalgiris Kaunas'] \
+                         .players['Tai Webster'])
+        
+    def test_find_furthest_number_player_multiple_players(self):
+        
+        result = testdata.season2.teams['CSKA Moscow'].find_furthest_number_player()
+    
+        player1 = testdata.season2.teams['CSKA Moscow'] \
+            .players['Alexander Khomenko']
+        player2 = testdata.season2.teams['CSKA Moscow'] \
+            .players['Janis Strelnieks']
+        
+        self.assertEqual(result, [player1, player2])
+            
+            
+        
     
 if __name__ == '__main__':
     unittest.main()

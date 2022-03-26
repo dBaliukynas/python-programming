@@ -48,7 +48,7 @@ season2.teams['CSKA Moscow'].add_player(task2.Player('Alexander', 'Khomenko', 4,
 season2.teams['CSKA Moscow'].add_player(task2.Player('Janis', 'Strelnieks', 13, 'Latvia',
                                                     'Forward', 7.2, 3.1, 4.5, 2.5, 1.6,
                                                     7.2))
-season2.teams['CSKA Moscow'].add_player(task2.Player('Michael', 'Eric', 50, 'Nigeria',
+season2.teams['CSKA Moscow'].add_player(task2.Player('Michael', 'Eric', 33, 'Nigeria',
                                                     'Center', 7.8, 3.8, 0.5, 0.5, 0.7,
                                                     7.3))
 season2.teams['CSKA Moscow'].add_player(task2.Player('Nikola', 'Milutinov', 33, 'New Serbia',

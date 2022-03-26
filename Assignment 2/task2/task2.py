@@ -1,7 +1,13 @@
 import json
 
 class Season:
-
+    '''
+    A class that represents EuroLeague's season.
+    ...
+    Methods
+    -------
+    '''
+    
     def __init__(self, name):
         self.name = name
         self.teams = {}
@@ -152,14 +158,20 @@ class Team:
         '''
         Parameters
         ----------
+        players : dict
+            Team's players
         name : str
             Team's name.
         wins : int
-            Team's wins in season.
+            Team's wins
+        win_streak : int
+            Team's win streak
+        loss_streak : int
+            Teams's loss streak
         losses : int
-            Team's losses in season.
+            Team's losses
         leaderboard_position : int
-            Team's position in season's leaderboard
+            Team's position in leaderboard
         '''
 
         self.players = {}
@@ -213,22 +225,21 @@ Supported attributes: "name", "surname", "nationality", "position".''')
     def find_furthest_number_player(self):
 
        number_diff = []
-       sorted_players = (sorted(self.players.items(), key=lambda item: item[1].number))
+       sorted_players = (sorted(self.players.values(), key=lambda item: item.number))
 
        for index in range(len(sorted_players)):
             if index == 0 and len(sorted_players) != 1:
-                number_diff.append(sorted_players[index + 1][1].number - sorted_players[index][1].number)
+                number_diff.append(sorted_players[index + 1].number - sorted_players[index].number)
             elif index < len(sorted_players) - 1:
 
-                number_diff.append(min((sorted_players[index][1].number - sorted_players[index - 1][1].number),
-                                  (sorted_players[index + 1][1].number - sorted_players[index][1].number )))
+                number_diff.append(min((sorted_players[index].number - sorted_players[index - 1].number),
+                                  (sorted_players[index + 1].number - sorted_players[index].number )))
             else:
-                number_diff.append((sorted_players[index][1].number - sorted_players[index - 1][1].number),
+                number_diff.append((sorted_players[index].number - sorted_players[index - 1].number),
                                      )
 
-       print(number_diff)
-       return dict(sorted_players[number_diff.index(max(number_diff)):len([index for index, number in
-                                       enumerate(number_diff) if number == max(number_diff)])+number_diff.index(max(number_diff))])
+       return sorted_players[number_diff.index(max(number_diff)):len([index for index, number in
+                                       enumerate(number_diff) if number == max(number_diff)])+number_diff.index(max(number_diff))]
     
     def find_best_player_by_value(self, attribute):
         sorted_players = sorted(self.players.items(), 
@@ -382,7 +393,6 @@ game2 = Game('Zalgiris Kaunass vs FC Barcelona', 29,
 season1.add_game(game1)
 season1.add_game(game2)
 print('\n')
-print(season1.teams['Zalgiris Kaunas'].find_furthest_number_player())
 
 def write_to_file(obj):
     with open('instances.txt', 'w') as file:

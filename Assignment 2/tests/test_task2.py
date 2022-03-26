@@ -3,7 +3,8 @@ import copy
 from tests import testdata
 from task2 import task2
 
-print(list(testdata.season1.games['Zalgiris Kaunas vs FC Barcelona'].count_performance_difference().values())[0])
+# print(testdata.season1.teams['Zalgiris Kaunas'].find_furthest_number_player()[0].__dict__)
+    
 class TestSeason(unittest.TestCase):
     def test_find_best_player_by_value_one_player(self):
         result = testdata.season1.find_best_player_by_value('points')[0]
@@ -90,6 +91,25 @@ class TestGame(unittest.TestCase):
         
         for value, expected_value in zip(result.values(), expected_values):
             self.assertEqual(value, expected_value)
+            
+    def test_find_better_team_by_value(self):
+        team1 = testdata.season1.teams['Zalgiris Kaunas']
+        team2 = testdata.season1.teams['FC Barcelona']
+        expected_values = [team2, team1, team2, team2, None, team1, team1,
+                            team1, team1, team2, team2]
+        attributes = ['assists', 'blocks', 'defensive_rebounds',
+                      'free_throw_percent', 'offensive_rebounds',
+                      'performance_index_rating', 'points', 'steals',
+                      'three_point_percent', 'turnovers', 'two_point_percent']
+        
+        for attribute, expected_value in zip(attributes, expected_values):
+            result = testdata.season1.games['Zalgiris Kaunas vs FC Barcelona'] \
+                .find_better_team_by_value(attribute)
+            self.assertEqual(result, expected_value)
+            
+class TestTeam(unittest.TestCase):
+    def test_find_furthest_number_player_one_player(self):
+        pass
     
 if __name__ == '__main__':
     unittest.main()

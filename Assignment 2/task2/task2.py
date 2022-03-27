@@ -1,4 +1,5 @@
 import json
+from task2 import maindata
 
 class Season:
     '''
@@ -8,7 +9,6 @@ class Season:
     def __init__(self, name):
         '''
         Initialize values when an instance is created.
-
         Parameters
         ----------
         name : str
@@ -22,7 +22,6 @@ class Season:
     def add_team(self, team):
         '''
         Add team's instance to season's instance dictionary.
-
         Parameters
         ----------
         team : object
@@ -33,7 +32,6 @@ class Season:
     def add_game(self, game):
         '''
         Add game's instance to season's instance dictionary.
-
         Parameters
         ----------
         game : object
@@ -45,12 +43,10 @@ class Season:
     def from_json(cls, season_dict):
         '''
         Create an instance from dictionary.
-
         Parameters
         ----------
         season_dict : dict
             Dictionary representing EuroLeague's season.
-
         Returns
         -------
         season: object
@@ -69,12 +65,10 @@ class Season:
     def find_best_players_by_value(self, attribute):
         '''
         Find best player from a season by given attribute.
-
         Parameters
         ----------
         attribute : str
             Specific name of player's value, i.e. "points", "assists", etc.
-
         Returns
         -------
         best_players: list
@@ -94,8 +88,6 @@ class Season:
 
             best_players_in_team.extend(team.find_best_players_by_value(attribute))
 
-        for best_player_in_team in best_players_in_team:
-            print(best_player_in_team.__dict__)
         sorted_best_players = sorted(best_players_in_team, reverse=True,
                        key=lambda item: getattr(item, attribute))
 
@@ -113,12 +105,10 @@ class Season:
     def find_highest_streak_teams(self, attribute):
         '''
         Find teams that has highest streak.
-
         Parameters
         ----------
         attribute : str
             Name of streak: "win_streak" or "loss_streak"
-
         Returns
         -------
         highest_streak_team: list
@@ -148,7 +138,6 @@ class Game:
     def __init__(self, name, _round, team1_performance, team2_performance):
         '''
         Initialize values when an instance is created.
-
         Parameters
         ----------
         name : str
@@ -190,14 +179,12 @@ class Game:
     def from_json(cls, game_dict, season_teams):
         '''
         Create an instance from dictionary.
-
         Parameters
         ----------
         game_dict : dict
             Dictionary representing EuroLeague's game.
         season_teams : dict
             All teams in a season.
-
         Returns
         -------
         game: object
@@ -216,7 +203,6 @@ class Game:
     def count_performance_difference(self):
         '''
         Count all team's performance values differences.
-
         Returns
         -------
         team_performance_difference: dict
@@ -245,13 +231,11 @@ class Game:
     def find_better_team_by_value(self, attribute):
         '''
         Find team that has higher value than the other.
-
         Parameters
         ----------
         attribute : str
             Specific name of team's performance value, i.e.
             "points", "assists", etc.
-
         Returns
         -------
         object
@@ -271,7 +255,6 @@ class Game:
 class Team:
     '''
     A class that represents EuroLeague's team.
-
     Methods
     -------
     find_furthest_number_player()
@@ -282,7 +265,6 @@ class Team:
     def __init__(self, name, wins, losses, leaderboard_position):
         '''
         Initialize values when an instance is created.
-
         Parameters
         ----------
         players : dict
@@ -309,12 +291,10 @@ class Team:
     def from_json(cls, team_dict):
         '''
         Create an instance from dictionary.
-
         Parameters
         ----------
         team_dict : dict
             Dictionary representing EuroLeague's team.
-
         Returns
         -------
         team: object
@@ -336,7 +316,6 @@ class Team:
     def add_player(self, player):
         '''
         Add player to team's instance dictionary.
-
         Parameters
         ----------
         player : object
@@ -348,7 +327,6 @@ class Team:
     def find_win_percentage(self):
         '''
         Find team's win percentage.
-
         Returns
         -------
         float
@@ -361,13 +339,11 @@ class Team:
     def count_players_value(self, attribute):
         '''
         Count players values by given attribute.
-
         Parameters
         ----------
         team_dict : dict
             Specific name of player's value, i.e.
             "nationality", "position", etc.
-
         Returns
         -------
         dict
@@ -376,7 +352,7 @@ class Team:
         '''
 
         if attribute not in ('name', 'surname', 'nationality', 'position'):
-            print(f'''Attribute "{attribute}" is not supported.
+            raise AttributeError(f'''Attribute "{attribute}" is not supported.
 Supported attributes: "name", "surname", "nationality", "position".''')
 
         players_values = {}
@@ -397,7 +373,6 @@ Supported attributes: "name", "surname", "nationality", "position".''')
         '''
         Find players whose numbers are
         furhtest from other adjacent player numbers.
-
         Returns
         -------
         furthest_number_players : list
@@ -433,12 +408,10 @@ Supported attributes: "name", "surname", "nationality", "position".''')
     def find_best_players_by_value(self, attribute):
         '''
         Find best player from a team by given attribute.
-
         Parameters
         ----------
         attribute : str
             Specific name of player's value, i.e. "points", "assists", etc.
-
         Returns
         -------
         list
@@ -465,7 +438,6 @@ class TeamPerformance:
                  defensive_rebounds, assists, steals, blocks, turnovers):
         '''
         Initialize values when an instance is created.
-
         Parameters
         ----------
         team : object
@@ -512,7 +484,6 @@ class TeamPerformance:
     def from_json(cls, team_performance_dict, season_teams):
         '''
         Create an instance from dictionary.
-
         Parameters
         ----------
         team_performance_dict : dict
@@ -553,7 +524,6 @@ class Player:
                  performance_index_rating):
         '''
         Initialize values when an instance is created.
-
         Parameters
         ----------
         name : str
@@ -597,12 +567,10 @@ class Player:
     def from_json(cls, player_dict):
         '''
         Create an instance from dictionary.
-
         Parameters
         ----------
         player_dict : dict
             Dictionary representing EuroLeague's player.
-
         Returns
         -------
         player object
@@ -625,7 +593,6 @@ class Player:
 def write_to_file(instance):
     '''
     Write instance to file in dictionary structure.
-
     Parameters
     ----------
     instance : obj
@@ -638,7 +605,6 @@ def write_to_file(instance):
 def load_from_file():
     '''
     Load dictionaries from file that represent instances.
-
     Returns
     ----------
     dict

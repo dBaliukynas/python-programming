@@ -3,10 +3,6 @@ import copy
 from tests import testdata
 from task2 import task2
 
-
-# print(testdata.season2.find_best_players_by_value('points'))
-# print(testdata.season2.teams['CSKA Moscow'].find_best_players_by_value('points')[1].__dict__)
-
 class TestSeason(unittest.TestCase):
     def test_find_best_players_by_value_one_player(self):
         result = testdata.season1.find_best_players_by_value('points')[0]

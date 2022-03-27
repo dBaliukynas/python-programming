@@ -1,5 +1,4 @@
 import json
-from task2 import maindata
 
 class Season:
     '''

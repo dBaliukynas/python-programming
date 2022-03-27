@@ -21,12 +21,12 @@ season1.teams['Zalgiris Kaunas'].add_player(task2.Player('Tai', 'Webster', 12, '
                                                     'Guard', 4.6, 1.1, 1.8, 0.4, 0.1,
                                                     2.8))
 
-game1 = task2.Game('Zalgiris Kaunas vs FC Barcelona', 29, 
+game1 = task2.Game('Zalgiris Kaunas vs FC Barcelona', 29,
               task2.TeamPerformance(season1.teams['Zalgiris Kaunas'], 108, 91, 44.2, 42.9,
                               85.4, 11, 17, 13, 13, 5, 12),
               task2.TeamPerformance(season1.teams['FC Barcelona'], 71, 84, 53.8, 40.0,
                               87.0, 11, 23, 20, 1, 0, 22 ))
-game2 = task2.Game('FC Barcelona vs AS Monaco', 28, 
+game2 = task2.Game('FC Barcelona vs AS Monaco', 28,
                task2.TeamPerformance(season1.teams['FC Barcelona'], 88, 91, 44.2, 42.9,
                               82.4, 14, 15, 9, 7, 6, 20),
                task2.TeamPerformance(season1.teams['AS Monaco'], 83, 72, 41.8, 30.2,
@@ -55,12 +55,12 @@ season2.teams['CSKA Moscow'].add_player(task2.Player('Nikola', 'Milutinov', 33, 
                                                     'Center', 7.8, 5.5, 1.8, 11.2, 4.2,
                                                     8.5))
 
-game1 = task2.Game('Anadolu Efes Istanbul vs FC Barcelona', 29, 
+game1 = task2.Game('Anadolu Efes Istanbul vs FC Barcelona', 29,
               task2.TeamPerformance(season2.teams['Anadolu Efes Istanbul'], 108, 91, 44.2, 42.9,
                               85.4, 11, 17, 13, 13, 5, 12),
               task2.TeamPerformance(season2.teams['FC Barcelona'], 110, 104, 53.8, 40.0,
                               87.0, 11, 23, 20, 1, 0, 22 ))
-game2 = task2.Game('FC Barcelona vs FC Bayern Munich', 28, 
+game2 = task2.Game('FC Barcelona vs FC Bayern Munich', 28,
                task2.TeamPerformance(season2.teams['FC Barcelona'], 88, 91, 44.2, 42.9,
                               82.4, 14, 15, 9, 7, 6, 20),
                task2.TeamPerformance(season2.teams['FC Bayern Munich'], 93, 92, 41.8, 30.2,

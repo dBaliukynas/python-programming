@@ -1,6 +1,6 @@
 import unittest
 import copy
-from tests import testdata
+from data import testdata
 from task2 import task2
 
 class TestSeason(unittest.TestCase):

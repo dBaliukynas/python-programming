@@ -65,5 +65,7 @@ game2 = task2.Game('FC Barcelona vs FC Bayern Munich', 28,
                               82.4, 14, 15, 9, 7, 6, 20),
                task2.TeamPerformance(season2.teams['FC Bayern Munich'], 93, 92, 41.8, 30.2,
                               66.0, 14, 13, 18, 1, 3, 21 ))
-season1.add_game(game1)
-season1.add_game(game2)
+season2.add_game(game1)
+season2.add_game(game2)
+
+

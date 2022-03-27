@@ -55,7 +55,7 @@ class Season:
 
         season.teams = {team['name']:Team.from_json(team)
                         for team in season_dict['teams'].values()}
-        season.games = {game['name']:Game.from_json(game, season.teams)
+        season.games = {game['name']:Game.from_json(game, season_teams=season.teams)
                         for game in season_dict['games'].values()}
 
         return season
@@ -175,7 +175,7 @@ class Game:
         add_streak(self)
 
     @classmethod
-    def from_json(cls, game_dict, season_teams):
+    def from_json(cls, game_dict, season_teams={}):
         '''
         Create an instance from dictionary.
         Parameters
@@ -191,9 +191,9 @@ class Game:
         '''
 
         team1_performance = TeamPerformance.from_json(game_dict['team1_performance'],
-                                                      season_teams)
+                                                      season_teams=season_teams)
         team2_performance = TeamPerformance.from_json(game_dict['team2_performance'],
-                                                      season_teams)
+                                                      season_teams=season_teams)
         game = cls(game_dict['name'], game_dict['round'], team1_performance,
                    team2_performance)
 
@@ -480,7 +480,7 @@ class TeamPerformance:
 
 
     @classmethod
-    def from_json(cls, team_performance_dict, season_teams):
+    def from_json(cls, team_performance_dict, season_teams={}):
         '''
         Create an instance from dictionary.
         Parameters
@@ -494,10 +494,12 @@ class TeamPerformance:
         team_performance: object
             Instance representing EuroLeague's team's performance.
         '''
-
-        for season_team_name, season_team in season_teams.items():
-            if team_performance_dict['team']['name'] == season_team_name:
-                team = season_team
+        if season_teams:
+            for season_team_name, season_team in season_teams.items():
+                if team_performance_dict['team']['name'] == season_team_name:
+                    team = season_team
+        else:
+            team = Team.from_json(team_performance_dict['team'])
         team_performance = cls(team, team_performance_dict['performance_index_rating'],
                                team_performance_dict['points'],
                                team_performance_dict['two_point_percent'],
@@ -589,25 +591,47 @@ class Player:
 
         return player
 
-def write_to_file(instance):
+def write_to_file(instances, *filenames):
     '''
-    Write instance to file in dictionary structure.
+    Write instance to files in dictionary structure.
     Parameters
     ----------
     instance : obj
         Instance.
     '''
 
-    with open('instances.txt', 'w') as file:
-        json.dump(instance, file, default=lambda item: item.__dict__)
+    for filename in filenames:
+        dict_string = '{"instances": ['
+        for index, instance in enumerate(instances):
+            dict_string += f'{{"{instance.__class__.__name__}": ' + json.dumps(instance, default=
+                lambda item: item.__dict__) + \
+            f'{"}," if index != len(instances) - 1 else "}"}'
+        dict_string+=']}'
 
-def load_from_file():
+        with open(filename, 'w') as file:
+            file.write(dict_string)
+
+
+def load_from_file(*filenames):
     '''
-    Load dictionaries from file that represent instances.
+    Load dictionaries from files that represent instances.
     Returns
     ----------
     dict
         Dictionaries that represent instances.
     '''
-    with open('instances.txt') as file:
-        return json.load(file)
+    json_dictionaries = []
+    for filename in filenames:
+
+        with open(filename) as file:
+            json_dictionaries.append(json.load(file))
+    return json_dictionaries
+
+def convert_to_instances(json_dictionaries):
+    instance_list = []
+    for json_dictionary in json_dictionaries:
+        for instances in json_dictionary['instances']:
+            instance_list.append(getattr(globals()[list(instances.keys())[0]], 'from_json') \
+                (instances[list(instances.keys())[0]]))
+    return instance_list
+

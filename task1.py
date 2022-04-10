@@ -71,18 +71,23 @@ def print_sorted_groups(sorted_groups, order, log_list_len, limit_number, no_log
     limit_index = 0
     group_count = len(sorted_groups.keys())
 
+<<<<<<< HEAD:Assignment 1/task1.py
     for index, (group_key, group) in enumerate(sorted_groups.items()):
 
         if limit_number is not None and limit_index == limit_number:
             if not no_logs:
                 print(f'SHOWING {limit_index} logs out of {log_list_len}')
             print(f'SHOWING {index} groups out of {group_count}')
+=======
+        if limit_number is not None and limit_index == int(limit_number):
+>>>>>>> 1e2f97a69b663082e0f635c0511bc51ee813d9c8:task1.py
             return
         print(f'\n{group_key}:')
 
         if not no_logs:
             for sorted_log in group['logs']:
 
+<<<<<<< HEAD:Assignment 1/task1.py
                 if limit_number is not None and limit_index == limit_number:
                     print_order_value(group, order)
                     print(f'SHOWING {limit_index} logs out of {log_list_len}')
@@ -91,6 +96,11 @@ def print_sorted_groups(sorted_groups, order, log_list_len, limit_number, no_log
 
                 print(f'{sorted_log}\n')
                 limit_index += 1
+=======
+            if limit_number is not None and limit_index == int(limit_number):
+                print_order_value(group, order)
+                return
+>>>>>>> 1e2f97a69b663082e0f635c0511bc51ee813d9c8:task1.py
 
             print_order_value(group, order)
             if limit_index == log_list_len:
@@ -247,7 +257,10 @@ def main():
                         'count percentage of all logged requests (count_p) '
                         'or by total number of bytes transferred (bytes)')
     parser.add_argument('--limit', '-l', help='Amount of rows to print')
+<<<<<<< HEAD:Assignment 1/task1.py
     parser.add_argument('--no_logs', '-nl', help='Print only keys but not logs themselves', action='store_true')
+=======
+>>>>>>> 1e2f97a69b663082e0f635c0511bc51ee813d9c8:task1.py
     args = parser.parse_args()
     filename = args.filename.split('/').pop()
 
@@ -274,8 +287,12 @@ def main():
                                             item[1][args.order], item[0]),
                                         reverse=True))
 
+<<<<<<< HEAD:Assignment 1/task1.py
             print_sorted_groups(sorted_groups, args.order,
                                 log_list_len, args.limit, args.no_logs)
+=======
+            print_sorted_groups(sorted_groups, args.order, args.limit)
+>>>>>>> 1e2f97a69b663082e0f635c0511bc51ee813d9c8:task1.py
     except FileNotFoundError:
         print(f'File "{filename}" does not exist.')
         sys.exit()

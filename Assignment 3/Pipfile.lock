@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3a438d3dca586335b5c7b6e82200a246476796c1976ff308cd9b9ea60e1ffca6"
+            "sha256": "501e83098f199c0b539ad35c0a8a8086daf738fdf84b27482a8272ca29502b4e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -38,6 +38,10 @@
             ],
             "markers": "python_version >= '3'",
             "version": "==2.0.12"
+        },
+        "euroleague-web-scraper": {
+            "editable": true,
+            "path": "."
         },
         "idna": {
             "hashes": [

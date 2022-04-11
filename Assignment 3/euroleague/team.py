@@ -1,4 +1,4 @@
-from player import Player
+from euroleague.player import Player
 
 class Team:
     '''
@@ -10,7 +10,7 @@ class Team:
         from adjacent player numbers.
     '''
 
-    def __init__(self, name, wins, losses, leaderboard_position):
+    def __init__(self, name, wins, losses, leaderboard_position=None):
         '''
         Initialize values when an instance is created.
         Parameters

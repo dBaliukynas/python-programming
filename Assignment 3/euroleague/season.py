@@ -1,5 +1,5 @@
-from team import Team
-from game import Game
+from euroleague.team import Team
+from euroleague.game import Game
 
 class Season:
     '''

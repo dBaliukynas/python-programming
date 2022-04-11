@@ -1,4 +1,4 @@
-from team import Team
+from euroleague.team import Team
 
 class TeamPerformance:
     '''

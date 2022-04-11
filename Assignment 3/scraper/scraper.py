@@ -1,7 +1,12 @@
+#!/usr/bin/env python3
+
 import requests
 from bs4 import BeautifulSoup
 import re
 
+from euroleague.season import Season
+from euroleague.team import Team
+# def main():
 
 teams_url = 'https://www.euroleaguebasketball.net/euroleague/teams/'
 teams_html = requests.get(teams_url)
@@ -18,24 +23,6 @@ teams_list_doc = teams_doc.find('ul', class_=re.compile('^teams-list'))
 team_hyperlinks = ['https://www.euroleaguebasketball.net/' + \
     list(team_doc.children)[0].attrs['href'] for team_doc in teams_list_doc.contents]
 
-# for team_hyperlink in team_hyperlinks:
-#     print(team_hyperlink)
-
-# print(team_hyperlinks[0])
-
-# =============================================================================
-# team_url = team_hyperlinks[0]
-# team_html = requests.get(team_url)
-# team_doc = BeautifulSoup(team_html.text, 'html.parser')
-#
-# # print(team_doc.prettify())
-#
-# team_name = team_doc.find('p', class_=re.compile('^club-info_name'))
-#
-# team_win_loss = team_doc.find_all('span', class_=re.compile('^club-info_param'))
-# team_wins = team_win_loss[0].string
-# team_losses = team_win_loss[1].string
-# =============================================================================
 
 standings_url = 'https://www.euroleaguebasketball.net/euroleague/standings/'
 standings_html = requests.get(standings_url)
@@ -43,19 +30,42 @@ standings_doc = BeautifulSoup(standings_html.text, 'html.parser')
 standings_team_names =  standings_doc.find_all('span',
                                     class_=re.compile('^complex-stat-table_mainClubName'))
 
+season_name = standings_doc.find('p', class_=re.compile('^standings_filterValue'))
+season_name = season_name.string.split(', ')[1]
+
+season_1 = Season(season_name)
 
 
-for standings_team_name in standings_team_names:
-    print(standings_team_name.text.replace('*', ''))
 
+for team_hyperlink in team_hyperlinks:
+    team_html = requests.get(team_hyperlink)
+    team_doc = BeautifulSoup(team_html.text, 'html.parser')
+    team_name = team_doc.find('p', class_=re.compile('^club-info_name'))
+    team_name = team_name.string
+    team_win_loss = team_doc.find_all('span', class_=re.compile('^club-info_param'))
 
-team_leaderboard_row_fragments = standings_doc.find_all('div',
-                       class_=re.compile('^complex-stat-table_sticky'))
+    # print(team_win_loss)
+    if (team_win_loss):
+        team_wins = team_win_loss[0].string
+        team_losses = team_win_loss[1].string
+    else:
+        team_wins = None
+        team_losses = None
 
-for team_leaderboard_row_fragment in team_leaderboard_row_fragments:
+    season_1.add_team(Team(team_name, team_wins, team_losses))
+
+    team_leaderboard_row_fragments = standings_doc.find_all('div',
+                           class_=re.compile('^complex-stat-table_sticky'))
+
+for index, team_leaderboard_row_fragment in enumerate(team_leaderboard_row_fragments):
     for team_leaderboard_position_wrappers in team_leaderboard_row_fragment.contents:
         for team_leaderboard_position in team_leaderboard_position_wrappers.contents:
             if (re.match(r'^<span', str(team_leaderboard_position)) is not None
                 and team_leaderboard_position.string.isnumeric()):
+                season_1.teams[standings_team_names[index-1].text.replace('*', '').rstrip()] \
+                    .leaderboard_position = team_leaderboard_position.string
 
-                print(team_leaderboard_position.string)
+s = season_1.__dict__
+
+# if __name__ == '__main__':
+#     main()

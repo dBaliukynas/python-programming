@@ -46,8 +46,8 @@ for team_hyperlink in team_hyperlinks:
 
     # print(team_win_loss)
     if (team_win_loss):
-        team_wins = team_win_loss[0].string
-        team_losses = team_win_loss[1].string
+        team_wins = int(team_win_loss[0].string)
+        team_losses = int(team_win_loss[1].string)
     else:
         team_wins = None
         team_losses = None
@@ -63,7 +63,7 @@ for index, team_leaderboard_row_fragment in enumerate(team_leaderboard_row_fragm
             if (re.match(r'^<span', str(team_leaderboard_position)) is not None
                 and team_leaderboard_position.string.isnumeric()):
                 season_1.teams[standings_team_names[index-1].text.replace('*', '').rstrip()] \
-                    .leaderboard_position = team_leaderboard_position.string
+                    .leaderboard_position = int(team_leaderboard_position.string)
 
 s = season_1.__dict__
 

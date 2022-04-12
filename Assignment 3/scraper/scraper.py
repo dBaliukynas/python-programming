@@ -6,45 +6,57 @@ import re
 
 from euroleague.season import Season
 from euroleague.team import Team
-# def main():
-
-teams_url = 'https://www.euroleaguebasketball.net/euroleague/teams/'
-teams_html = requests.get(teams_url)
-teams_doc = BeautifulSoup(teams_html.text, 'html.parser')
-
-# print(html.prettify())
-# teams_list_doc = teams_doc.find(class_='teams-list_list__3M_EG')
-teams_list_doc = teams_doc.find('ul', class_=re.compile('^teams-list'))
-# teams_list_doc = teams_doc.select('ul[class*="teams-list"]')
-# print(teams_list_doc)
-# print(teams_list_doc)
-# print(teams_list_doc.contents)
-
-team_hyperlinks = ['https://www.euroleaguebasketball.net/' + \
-    list(team_doc.children)[0].attrs['href'] for team_doc in teams_list_doc.contents]
+from euroleague.player import Player
 
 
-standings_url = 'https://www.euroleaguebasketball.net/euroleague/standings/'
-standings_html = requests.get(standings_url)
-standings_doc = BeautifulSoup(standings_html.text, 'html.parser')
-standings_team_names =  standings_doc.find_all('span',
-                                    class_=re.compile('^complex-stat-table_mainClubName'))
+def create_season(base_url):
+    base_html = requests.get(base_url)
+    base_doc = BeautifulSoup(base_html.text, 'html.parser')
 
-season_name = standings_doc.find('p', class_=re.compile('^standings_filterValue'))
-season_name = season_name.string.split(', ')[1]
+    tournament_name = base_doc.find(
+        'h4', class_=re.compile('^our-tournaments-item_title'))
+    tournament_url = tournament_name.next_sibling.attrs['href']
+    tournament_html = requests.get(base_url + tournament_url)
+    tournament_doc = BeautifulSoup(tournament_html.text, 'html.parser')
 
-season_1 = Season(season_name)
+    standings_url = base_url + tournament_doc.find('a', text='Standings', class_=re.compile(
+        '^main-nav_link')).attrs['href']
+    standings_html = requests.get(standings_url)
+    standings_doc = BeautifulSoup(standings_html.text, 'html.parser')
+    standings_team_names = standings_doc.find_all('span',
+                                                  class_=re.compile('^complex-stat-table_mainClubName'))
+
+    season_name = standings_doc.find(
+        'p', class_=re.compile('^standings_filterValue'))
+    season_name = season_name.string.split(', ')[1]
+
+    season = Season(season_name)
+
+    teams_url = base_url + \
+        tournament_doc.find('a', text='Teams', class_=re.compile(
+            '^main-nav_link')).attrs['href']
+
+    teams_html = requests.get(teams_url)
+    teams_doc = BeautifulSoup(teams_html.text, 'html.parser')
+    teams_list_doc = teams_doc.find_all('a', class_=re.compile('^teams-card'))
+    team_hyperlinks = [base_url +
+                       team_doc.attrs['href'] for team_doc in teams_list_doc]
+
+    for team_hyperlink in team_hyperlinks:
+        season.add_team(create_team(base_url, team_hyperlink))
+    add_team_leaderboard_positions(standings_doc, standings_team_names, season)
+
+    return season
 
 
-
-for team_hyperlink in team_hyperlinks:
+def create_team(base_url, team_hyperlink):
     team_html = requests.get(team_hyperlink)
     team_doc = BeautifulSoup(team_html.text, 'html.parser')
     team_name = team_doc.find('p', class_=re.compile('^club-info_name'))
     team_name = team_name.string
-    team_win_loss = team_doc.find_all('span', class_=re.compile('^club-info_param'))
+    team_win_loss = team_doc.find_all(
+        'span', class_=re.compile('^club-info_param'))
 
-    # print(team_win_loss)
     if (team_win_loss):
         team_wins = int(team_win_loss[0].string)
         team_losses = int(team_win_loss[1].string)
@@ -52,20 +64,61 @@ for team_hyperlink in team_hyperlinks:
         team_wins = None
         team_losses = None
 
-    season_1.add_team(Team(team_name, team_wins, team_losses))
+    players_list_doc = team_doc.find_all(
+        'a', class_=re.compile('^game-roster-group-player_playerCard'))
+
+    player_hyperlinks = [base_url + player_doc.attrs['href']
+                         for player_doc in players_list_doc if '/teams/' not in player_doc.attrs['href']]
+
+    team = Team(team_name, team_wins, team_losses)
+
+    for player_hyperlink in player_hyperlinks:
+
+        team.add_player(create_player(player_hyperlink, verbose=True))
+
+    return team
+
+
+def add_team_leaderboard_positions(standings_doc, standings_team_names, season_1):
 
     team_leaderboard_row_fragments = standings_doc.find_all('div',
-                           class_=re.compile('^complex-stat-table_sticky'))
+                                                            class_=re.compile('^complex-stat-table_sticky'))
 
-for index, team_leaderboard_row_fragment in enumerate(team_leaderboard_row_fragments):
-    for team_leaderboard_position_wrappers in team_leaderboard_row_fragment.contents:
-        for team_leaderboard_position in team_leaderboard_position_wrappers.contents:
-            if (re.match(r'^<span', str(team_leaderboard_position)) is not None
-                and team_leaderboard_position.string.isnumeric()):
-                season_1.teams[standings_team_names[index-1].text.replace('*', '').rstrip()] \
-                    .leaderboard_position = int(team_leaderboard_position.string)
+    for index, team_leaderboard_row_fragment in enumerate(team_leaderboard_row_fragments):
+        for team_leaderboard_position_wrappers in team_leaderboard_row_fragment.contents:
+            for team_leaderboard_position in team_leaderboard_position_wrappers.contents:
+                if (re.match(r'^<span', str(team_leaderboard_position)) is not None
+                        and team_leaderboard_position.string.isnumeric()):
+                    season_1.teams[standings_team_names[index-1].text.replace('*', '').rstrip()] \
+                        .leaderboard_position = int(team_leaderboard_position.string)
 
-s = season_1.__dict__
 
-# if __name__ == '__main__':
-#     main()
+def create_player(player_hyperlink, verbose=None):
+
+    player_html = requests.get(player_hyperlink)
+    player_doc = BeautifulSoup(player_html.text, 'html.parser')
+    player_name = player_doc.find('span', class_=re.compile(
+        '^hero-info_firstName')).string.title().strip()
+    player_surname = player_doc.find('span', class_=re.compile(
+        '^hero-info_lastName')).string.title().strip()
+
+    player = Player(player_name, player_surname, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    if verbose is not None:
+
+        print(player_html.status_code)
+        print(player_doc.find('span', class_=re.compile('^hero-info_firstName')))
+        print(player_doc.find('span', class_=re.compile('^hero-info_lastName')))
+        print(player_name, player_surname)
+
+    return player
+
+
+def main():
+    base_url = 'https://www.euroleaguebasketball.net'
+    s = create_season(base_url)
+    # create_team(create_season(standings_doc), team_hyperlinks, standings_doc, standings_team_names)
+    print(json.dumps(s, default=lambda item: item.__dict__))
+
+
+if __name__ == '__main__':
+    main()

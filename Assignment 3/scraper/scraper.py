@@ -7,6 +7,7 @@ import re
 from euroleague.season import Season
 from euroleague.team import Team
 from euroleague.player import Player
+from instance_utils import file_operations as fo
 
 
 def create_season(base_url):
@@ -41,9 +42,12 @@ def create_season(base_url):
     teams_list_doc = teams_doc.find_all('a', class_=re.compile('^teams-card'))
     team_hyperlinks = [base_url +
                        team_doc.attrs['href'] for team_doc in teams_list_doc]
-
+    i=0
     for team_hyperlink in team_hyperlinks:
         season.add_team(create_team(base_url, team_hyperlink))
+        if i == 0:
+            return season
+        i+=1
     add_team_leaderboard_positions(standings_doc, standings_team_names, season)
 
     return season
@@ -72,11 +76,34 @@ def create_team(base_url, team_hyperlink):
 
     team = Team(team_name, team_wins, team_losses)
 
+    create_team_print(team_html, team_doc, team_name,
+                      team_win_loss, team_wins, team_losses)
+
     for player_hyperlink in player_hyperlinks:
 
         team.add_player(create_player(player_hyperlink, verbose=True))
 
     return team
+
+
+def create_team_print(team_html, team_doc, team_name, team_win_loss, team_wins, team_losses):
+    print('''+------+
+| TEAM |
++------+''')
+    print('---------------------------------------------------------------')
+    print(f'HTTP Status Code: {team_html.status_code}\n')
+    print('**********************************************')
+    print(team_doc.find('p', class_=re.compile('^club-info_name')))
+    if (team_wins):
+        print(team_win_loss[0])
+
+    if (team_losses):
+        print(team_win_loss[1])
+    print('**********************************************\n')
+    print(f'Name: {team_name}')
+    print(f'Wins: {team_wins}')
+    print(f'Losses: {team_losses}')
+    print('---------------------------------------------------------------\n\n')
 
 
 def add_team_leaderboard_positions(standings_doc, standings_team_names, season_1):
@@ -94,7 +121,6 @@ def add_team_leaderboard_positions(standings_doc, standings_team_names, season_1
 
 
 def create_player(player_hyperlink, verbose=None):
-
     player_html = requests.get(player_hyperlink)
     player_doc = BeautifulSoup(player_html.text, 'html.parser')
     player_name = player_doc.find('span', class_=re.compile(
@@ -134,8 +160,11 @@ def create_player(player_hyperlink, verbose=None):
 def create_player_print(player_html, player_doc, player_name, player_surname, player_number, player_nationality,
                         player_position, player_points, player_rebounds, player_assists, player_steals, player_blocks,
                         player_performance_index_rating):
+    print('''+--------+
+| PLAYER |
++--------+''')
     print('---------------------------------------------------------------')
-    print(f'HTTP Status Code: {player_html.status_code}')
+    print(f'HTTP Status Code: {player_html.status_code}\n')
     print('**********************************************')
     print(player_doc.find('span', class_=re.compile('^hero-info_firstName')))
     print(player_doc.find('span', class_=re.compile('^hero-info_lastName')))
@@ -158,7 +187,7 @@ def create_player_print(player_html, player_doc, player_name, player_surname, pl
     print((player_doc.find_all('span', text='PIR', class_=re.compile(
         '^stats-item_name'))[0].previous_sibling))
 
-    print('**********************************************')
+    print('**********************************************\n')
     print(player_name, player_surname)
     print(f'Number: {player_number}')
     print(f'Nationality: {player_nationality}')
@@ -169,15 +198,18 @@ def create_player_print(player_html, player_doc, player_name, player_surname, pl
     print(f'Steals: {player_steals}')
     print(f'Blocks: {player_blocks}')
     print(f'Performance Index Rating: {player_performance_index_rating}')
-    print('---------------------------------------------------------------')
+    print('---------------------------------------------------------------\n\n')
 
 
 def main():
     base_url = 'https://www.euroleaguebasketball.net'
-    s = create_season(base_url)
-    # create_team(create_season(standings_doc), team_hyperlinks, standings_doc, standings_team_names)
-    print(json.dumps(s, default=lambda item: item.__dict__))
+    # season = create_season(base_url)
+    # fo.write_to_file([season], 'season.json')
+    # print(json.dumps(s, default=lambda item: item.__dict__))
 
 
+season = create_season('https://www.euroleaguebasketball.net')
+fo.write_to_file([season], 'test2.json')
+testing = fo.convert_to_instances(fo.load_from_file('test2.json'), vars())
 if __name__ == '__main__':
     main()

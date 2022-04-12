@@ -101,16 +101,75 @@ def create_player(player_hyperlink, verbose=None):
         '^hero-info_firstName')).string.title().strip()
     player_surname = player_doc.find('span', class_=re.compile(
         '^hero-info_lastName')).string.title().strip()
+    player_number = int(player_doc.find('div', class_=re.compile(
+        '^hero-info_numberBlock')).contents[1].string)
+    player_nationality = player_doc.find(
+        'span', class_=re.compile('^hero-info_key')).next_sibling.string
+    player_position = player_doc.find(
+        'div', class_=re.compile('^hero-info_position')).string
+    player_points = float(player_doc.find_all('span', text='PTS', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling.string)
+    player_rebounds = float(player_doc.find_all('span', text='REB', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling.string)
+    player_assists = float(player_doc.find_all('span', text='AST', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling.string)
+    player_steals = float(player_doc.find_all('span', text='STL', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling.string)
+    player_blocks = float(player_doc.find_all('span', text='BLK', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling.string)
+    player_performance_index_rating = float(player_doc.find_all('span', text='PIR', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling.string)
 
-    player = Player(player_name, player_surname, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    player = Player(player_name, player_surname, player_number, player_nationality, player_position, player_points,
+                    player_rebounds, player_assists, player_steals, player_blocks, player_performance_index_rating)
+
     if verbose is not None:
-
-        print(player_html.status_code)
-        print(player_doc.find('span', class_=re.compile('^hero-info_firstName')))
-        print(player_doc.find('span', class_=re.compile('^hero-info_lastName')))
-        print(player_name, player_surname)
+        create_player_print(player_html, player_doc, player_name, player_surname, player_number, player_nationality, player_position,
+                            player_points, player_rebounds, player_assists, player_steals, player_blocks,
+                            player_performance_index_rating)
 
     return player
+
+
+def create_player_print(player_html, player_doc, player_name, player_surname, player_number, player_nationality,
+                        player_position, player_points, player_rebounds, player_assists, player_steals, player_blocks,
+                        player_performance_index_rating):
+    print('---------------------------------------------------------------')
+    print(f'HTTP Status Code: {player_html.status_code}')
+    print('**********************************************')
+    print(player_doc.find('span', class_=re.compile('^hero-info_firstName')))
+    print(player_doc.find('span', class_=re.compile('^hero-info_lastName')))
+    print(player_doc.find('div', class_=re.compile(
+        '^hero-info_numberBlock')).contents[1])
+    print(player_doc.find(
+        'span', class_=re.compile('^hero-info_key')).next_sibling)
+    print(player_doc.find(
+        'div', class_=re.compile('^hero-info_position')))
+    print(player_doc.find_all('span', text='PTS', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling)
+    print(player_doc.find_all('span', text='REB', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling)
+    print(player_doc.find_all('span', text='AST', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling)
+    print(player_doc.find_all('span', text='STL', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling)
+    print(player_doc.find_all('span', text='BLK', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling)
+    print((player_doc.find_all('span', text='PIR', class_=re.compile(
+        '^stats-item_name'))[0].previous_sibling))
+
+    print('**********************************************')
+    print(player_name, player_surname)
+    print(f'Number: {player_number}')
+    print(f'Nationality: {player_nationality}')
+    print(f'Position: {player_position}')
+    print(f'Points: {player_points}')
+    print(f'Rebounds: {player_rebounds}')
+    print(f'Assists: {player_assists}')
+    print(f'Steals: {player_steals}')
+    print(f'Blocks: {player_blocks}')
+    print(f'Performance Index Rating: {player_performance_index_rating}')
+    print('---------------------------------------------------------------')
 
 
 def main():

@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import time
+import concurrent.futures
 
 from euroleague.season import Season
 from euroleague.team import Team
@@ -54,7 +55,7 @@ def create_season(base_url, team_limit):
             return season
 
         season.add_team(create_team(index, base_url,
-                        team_hyperlink, team_leaderboard_positions, verbose=True))
+                                    team_hyperlink, team_leaderboard_positions, verbose=True))
 
     return season
 
@@ -91,21 +92,31 @@ def create_team(team_index,  base_url, team_hyperlink, team_leaderboard_position
         create_team_print(team_html, team_doc, team_name,
                           team_win_loss, team_wins, team_losses, team_leaderboard_position)
 
-    for player_hyperlink in player_hyperlinks:
+        def test(player_hyperlink):
 
-        global fail_count
-   
-        while True:
-            try:
-                team.add_player(create_player(player_hyperlink, verbose=True))
-                break
-            except AttributeError:
-                if verbose is not None:
-                    print("Player creation failed. Retrying...")
-                    fail_count += 1
+            global fail_count
+            max_attempts = 2
+            attempts = 0
+
+            while attempts < max_attempts:
+                try:
+                    team.add_player(create_player(
+                        player_hyperlink, verbose=None))
+                    break
+                except (AttributeError, IndexError):
+                    attempts += 1
+
+                    if (attempts == 1):
+                        fail_count += 1
+
+                    print(
+                        f"Player fetching has failed. Retrying... \nURL: {player_hyperlink}")
                     time.sleep(3)
 
-    return team
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+        for player_hyperlink in player_hyperlinks:
+            executor.submit(test, player_hyperlink)
+        return team
 
 
 def create_team_print(team_html, team_doc, team_name, team_win_loss, team_wins, team_losses, team_leaderboard_position):
@@ -230,6 +241,7 @@ def main():
     # season = create_season(base_url)
     # fo.write_to_file([season], 'season.json')
     # print(json.dumps(s, default=lambda item: item.__dict__))
+
 
 fail_count = 0
 season = create_season('https://www.euroleaguebasketball.net', None)

@@ -3,14 +3,18 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import time
+import threading
 
 from euroleague.season import Season
 from euroleague.team import Team
 from euroleague.player import Player
 from instance_utils import file_operations as fo
 
+start = time.perf_counter()
 
-def create_season(base_url):
+
+def create_season(base_url, team_limit):
     base_html = requests.get(base_url)
     base_doc = BeautifulSoup(base_html.text, 'html.parser')
 
@@ -42,24 +46,32 @@ def create_season(base_url):
     teams_list_doc = teams_doc.find_all('a', class_=re.compile('^teams-card'))
     team_hyperlinks = [base_url +
                        team_doc.attrs['href'] for team_doc in teams_list_doc]
-    i=0
-    for team_hyperlink in team_hyperlinks:
-        season.add_team(create_team(base_url, team_hyperlink))
-        if i == 0:
+
+    team_leaderboard_positions = create_leaderboard_positions(
+        standings_doc, standings_team_names, season)
+
+    for index, team_hyperlink in enumerate(team_hyperlinks):
+        if team_limit is not None and index >= team_limit:
             return season
-        i+=1
-    add_team_leaderboard_positions(standings_doc, standings_team_names, season)
+
+        season.add_team(create_team(index, base_url,
+                        team_hyperlink, team_leaderboard_positions, verbose=True))
 
     return season
 
 
-def create_team(base_url, team_hyperlink):
+def create_team(team_index,  base_url, team_hyperlink, team_leaderboard_positions, verbose=None):
     team_html = requests.get(team_hyperlink)
     team_doc = BeautifulSoup(team_html.text, 'html.parser')
     team_name = team_doc.find('p', class_=re.compile('^club-info_name'))
     team_name = team_name.string
     team_win_loss = team_doc.find_all(
         'span', class_=re.compile('^club-info_param'))
+    if (team_name in team_leaderboard_positions):
+
+        team_leaderboard_position = team_leaderboard_positions[team_name]
+    else:
+        team_leaderboard_position = None
 
     if (team_win_loss):
         team_wins = int(team_win_loss[0].string)
@@ -74,19 +86,29 @@ def create_team(base_url, team_hyperlink):
     player_hyperlinks = [base_url + player_doc.attrs['href']
                          for player_doc in players_list_doc if '/teams/' not in player_doc.attrs['href']]
 
-    team = Team(team_name, team_wins, team_losses)
+    team = Team(team_name, team_wins, team_losses, team_leaderboard_position)
 
-    create_team_print(team_html, team_doc, team_name,
-                      team_win_loss, team_wins, team_losses)
+    if verbose is not None:
+        create_team_print(team_html, team_doc, team_name,
+                          team_win_loss, team_wins, team_losses, team_leaderboard_position)
 
     for player_hyperlink in player_hyperlinks:
-
-        team.add_player(create_player(player_hyperlink, verbose=True))
+        global fail_count
+   
+        while True:
+            try:
+                team.add_player(create_player(player_hyperlink, verbose=True))
+                break
+            except AttributeError:
+                if verbose is not None:
+                    print("Player creation failed. Retrying...")
+                    fail_count += 1
+                    time.sleep(3)
 
     return team
 
 
-def create_team_print(team_html, team_doc, team_name, team_win_loss, team_wins, team_losses):
+def create_team_print(team_html, team_doc, team_name, team_win_loss, team_wins, team_losses, team_leaderboard_position):
     print('''+------+
 | TEAM |
 +------+''')
@@ -103,21 +125,23 @@ def create_team_print(team_html, team_doc, team_name, team_win_loss, team_wins, 
     print(f'Name: {team_name}')
     print(f'Wins: {team_wins}')
     print(f'Losses: {team_losses}')
+    print(f'Leaderboard position: {team_leaderboard_position}')
     print('---------------------------------------------------------------\n\n')
 
 
-def add_team_leaderboard_positions(standings_doc, standings_team_names, season_1):
-
+def create_leaderboard_positions(standings_doc, standings_team_names, season):
+    team_leaderboard_positions = {}
     team_leaderboard_row_fragments = standings_doc.find_all('div',
                                                             class_=re.compile('^complex-stat-table_sticky'))
 
     for index, team_leaderboard_row_fragment in enumerate(team_leaderboard_row_fragments):
-        for team_leaderboard_position_wrappers in team_leaderboard_row_fragment.contents:
-            for team_leaderboard_position in team_leaderboard_position_wrappers.contents:
-                if (re.match(r'^<span', str(team_leaderboard_position)) is not None
-                        and team_leaderboard_position.string.isnumeric()):
-                    season_1.teams[standings_team_names[index-1].text.replace('*', '').rstrip()] \
-                        .leaderboard_position = int(team_leaderboard_position.string)
+        if index != 0:
+            team_leaderboard_position = team_leaderboard_row_fragment.contents[
+                0].contents[0].string
+            team_leaderboard_positions.update({
+                standings_team_names[index-1].text.replace('*', '').rstrip(): team_leaderboard_position.string})
+
+    return team_leaderboard_positions
 
 
 def create_player(player_hyperlink, verbose=None):
@@ -207,9 +231,13 @@ def main():
     # fo.write_to_file([season], 'season.json')
     # print(json.dumps(s, default=lambda item: item.__dict__))
 
-
-season = create_season('https://www.euroleaguebasketball.net')
-fo.write_to_file([season], 'test2.json')
-testing = fo.convert_to_instances(fo.load_from_file('test2.json'), vars())
+fail_count = 0
+season = create_season('https://www.euroleaguebasketball.net', None)
+fo.write_to_file([season], 'testing1.json', 'testing2.json')
+testing = fo.convert_to_instances(fo.load_from_file('testing1.json'), vars())
 if __name__ == '__main__':
     main()
+
+finish = time.perf_counter()
+print(f'Total time: {finish-start} seconds')
+print(f'Failed: {fail_count} times')

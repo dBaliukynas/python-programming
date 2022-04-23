@@ -1,17 +1,12 @@
-#!/usr/bin/env python3
+import concurrent.futures
+import re
+import time
 
 import requests
 from bs4 import BeautifulSoup
-import re
-import time
-import concurrent.futures
-
+from euroleague.player import Player
 from euroleague.season import Season
 from euroleague.team import Team
-from euroleague.player import Player
-from instance_utils import file_operations as fo
-
-start = time.perf_counter()
 
 
 def create_season(base_url, team_limit):
@@ -50,12 +45,16 @@ def create_season(base_url, team_limit):
     team_leaderboard_positions = create_leaderboard_positions(
         standings_doc, standings_team_names, season)
 
-    for index, team_hyperlink in enumerate(team_hyperlinks):
+    def add_teams(team_hyperlink, index):
         if team_limit is not None and index >= team_limit:
             return season
 
         season.add_team(create_team(index, base_url,
                                     team_hyperlink, team_leaderboard_positions, verbose=True))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+        for index, team_hyperlink in enumerate(team_hyperlinks):
+
+            executor.submit(add_teams, team_hyperlink, index)
 
     return season
 
@@ -92,31 +91,28 @@ def create_team(team_index,  base_url, team_hyperlink, team_leaderboard_position
         create_team_print(team_html, team_doc, team_name,
                           team_win_loss, team_wins, team_losses, team_leaderboard_position)
 
-        def test(player_hyperlink):
+    for player_hyperlink in player_hyperlinks:
+        # global fail_count
+        max_attempts = 2
+        attempts = 0
 
-            global fail_count
-            max_attempts = 2
-            attempts = 0
+        while attempts < max_attempts:
+            try:
+                team.add_player(create_player(
+                    player_hyperlink, verbose=None))
+                break
+            except (AttributeError, IndexError):
+                # time.sleep(3)
+                attempts += 1
 
-            while attempts < max_attempts:
-                try:
-                    team.add_player(create_player(
-                        player_hyperlink, verbose=None))
-                    break
-                except (AttributeError, IndexError):
-                    attempts += 1
+            if (attempts == 1):
+                pass
+                # fail_count += 1
 
-                    if (attempts == 1):
-                        fail_count += 1
+            print(
+                f"Player creation has failed. Retrying... \nURL: {player_hyperlink}\n")
 
-                    print(
-                        f"Player fetching has failed. Retrying... \nURL: {player_hyperlink}")
-                    time.sleep(3)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-        for player_hyperlink in player_hyperlinks:
-            executor.submit(test, player_hyperlink)
-        return team
+    return team
 
 
 def create_team_print(team_html, team_doc, team_name, team_win_loss, team_wins, team_losses, team_leaderboard_position):
@@ -156,6 +152,7 @@ def create_leaderboard_positions(standings_doc, standings_team_names, season):
 
 
 def create_player(player_hyperlink, verbose=None):
+
     player_html = requests.get(player_hyperlink)
     player_doc = BeautifulSoup(player_html.text, 'html.parser')
     player_name = player_doc.find('span', class_=re.compile(
@@ -238,18 +235,5 @@ def create_player_print(player_html, player_doc, player_name, player_surname, pl
 
 def main():
     base_url = 'https://www.euroleaguebasketball.net'
-    # season = create_season(base_url)
-    # fo.write_to_file([season], 'season.json')
-    # print(json.dumps(s, default=lambda item: item.__dict__))
-
-
-fail_count = 0
-season = create_season('https://www.euroleaguebasketball.net', None)
-fo.write_to_file([season], 'testing1.json', 'testing2.json')
-testing = fo.convert_to_instances(fo.load_from_file('testing1.json'), vars())
-if __name__ == '__main__':
-    main()
-
-finish = time.perf_counter()
-print(f'Total time: {finish-start} seconds')
-print(f'Failed: {fail_count} times')
+    season = create_season('https://www.euroleaguebasketball.net', None)
+    return season

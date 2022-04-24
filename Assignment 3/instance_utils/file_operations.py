@@ -1,5 +1,5 @@
 import json
-
+import os
 
 def write_to_file(instance_groups, *filenames):
     '''
@@ -11,6 +11,7 @@ def write_to_file(instance_groups, *filenames):
     filenames: string
 
     '''
+
     for instance_group, filename in zip(instance_groups, filenames):
         if (len(instance_groups) != len(filenames)):
             print('Instance groups and filename lengths should be the same.')

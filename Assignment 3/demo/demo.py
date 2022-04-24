@@ -3,7 +3,6 @@
 import time
 
 from scraper import scraper
-from scraper import scraper_threading
 from instance_utils import file_operations as fo
 
 
@@ -21,7 +20,8 @@ def main():
 
     start_scraper_threading_time = time.perf_counter()
 
-    season_scraper_threading = scraper.EuroLeagueScraper(team_verbose=True)
+    season_scraper_threading = scraper.EuroLeagueScraper(
+        team_verbose=True)
     season_with_threading = season_scraper_threading.create_season()
 
     finish_scraper_threading_time = time.perf_counter()

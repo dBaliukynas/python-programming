@@ -30,6 +30,8 @@ class EuroLeagueScraper:
             A boolean value that tells whether scraper should print out information about team creation.
         player_verbose : bool
             A boolean value that tells whether scraper should print out information about player creation.
+        sleep_time : int
+            An integer value that tells for how long scraper should sleep when a player or team creation is failed (in seconds).
         '''
 
         self.base_url = 'https://www.euroleaguebasketball.net'
@@ -84,7 +86,7 @@ class EuroLeagueScraper:
 
         def add_teams(index, team_hyperlink):
             '''
-            Add team instances to a season instance.
+            Add team instances to season instance's dictionary.
             '''
 
             if self.team_limit is not None and index >= self.team_limit:
@@ -103,7 +105,7 @@ class EuroLeagueScraper:
                     time.sleep(self.sleep_time)
                     attempts += 1
 
-                if (attempts == 1):
+                if attempts == 1:
                     self.team_creation_fails += 1
                     self.__class__.team_creation_fails += 1
 
@@ -136,18 +138,18 @@ class EuroLeagueScraper:
 
         team_response = requests.get(team_hyperlink)
         team_doc = BeautifulSoup(team_response.text, 'html.parser')
+        
         team_name = team_doc.find('p', class_=re.compile('^club-info_name'))
         team_name = team_name.string
         team_win_loss = team_doc.find_all(
             'span', class_=re.compile('^club-info_param'))
 
-        if (team_name in team_leaderboard_positions):
-
+        if team_name in team_leaderboard_positions:
             team_leaderboard_position = team_leaderboard_positions[team_name]
         else:
             team_leaderboard_position = None
 
-        if (team_win_loss):
+        if team_win_loss:
             team_wins = int(team_win_loss[0].string)
             team_losses = int(team_win_loss[1].string)
         else:
@@ -164,8 +166,8 @@ class EuroLeagueScraper:
                     team_leaderboard_position)
 
         if self.team_verbose:
-            self.create_team_print(team_response, team_doc, team_name,
-                                   team_win_loss, team_wins, team_losses, team_leaderboard_position)
+            self.print_team_creation_info(team_response, team_doc, team_name,
+                                          team_win_loss, team_wins, team_losses, team_leaderboard_position)
 
         for player_hyperlink in player_hyperlinks:
             max_attempts = 2
@@ -180,7 +182,7 @@ class EuroLeagueScraper:
                     time.sleep(self.sleep_time)
                     attempts += 1
 
-                if (attempts == 1):
+                if attempts == 1:
                     self.player_creation_fails += 1
                     self.__class__.player_creation_fails += 1
 
@@ -190,7 +192,7 @@ class EuroLeagueScraper:
         return team
 
     @staticmethod
-    def create_team_print(team_response, team_doc, team_name, team_win_loss, team_wins, team_losses, team_leaderboard_position):
+    def print_team_creation_info(team_response, team_doc, team_name, team_win_loss, team_wins, team_losses, team_leaderboard_position):
         '''
         Print information about team creation.
         Parameters
@@ -218,10 +220,10 @@ class EuroLeagueScraper:
         print(f'HTTP Status Code: {team_response.status_code}\n')
         print('**********************************************')
         print(team_doc.find('p', class_=re.compile('^club-info_name')))
-        if (team_wins):
+        if team_wins:
             print(team_win_loss[0])
 
-        if (team_losses):
+        if team_losses:
             print(team_win_loss[1])
         print('**********************************************\n')
         print(f'Name: {team_name}')
@@ -268,6 +270,7 @@ class EuroLeagueScraper:
 
         player_response = requests.get(player_hyperlink)
         player_doc = BeautifulSoup(player_response.text, 'html.parser')
+
         player_name = player_doc.find('span', class_=re.compile(
             '^hero-info_firstName')).string.title().strip()
         player_surname = player_doc.find('span', class_=re.compile(
@@ -295,16 +298,16 @@ class EuroLeagueScraper:
                         player_rebounds, player_assists, player_steals, player_blocks, player_performance_index_rating)
 
         if self.player_verbose:
-            self.create_player_print(player_response, player_doc, player_name, player_surname, player_number, player_nationality, player_position,
-                                     player_points, player_rebounds, player_assists, player_steals, player_blocks,
-                                     player_performance_index_rating)
+            self.print_player_creation_info(player_response, player_doc, player_name, player_surname, player_number, player_nationality, player_position,
+                                            player_points, player_rebounds, player_assists, player_steals, player_blocks,
+                                            player_performance_index_rating)
 
         return player
 
     @staticmethod
-    def create_player_print(player_response, player_doc, player_name, player_surname, player_number, player_nationality,
-                            player_position, player_points, player_rebounds, player_assists, player_steals, player_blocks,
-                            player_performance_index_rating):
+    def print_player_creation_info(player_response, player_doc, player_name, player_surname, player_number, player_nationality,
+                                   player_position, player_points, player_rebounds, player_assists, player_steals, player_blocks,
+                                   player_performance_index_rating):
         '''
         Print information about player creation.
         Parameters

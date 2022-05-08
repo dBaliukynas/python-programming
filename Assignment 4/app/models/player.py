@@ -14,13 +14,13 @@ class Player(db.Model):
         nullable=False
     )
     surname = db.Column(
-        db.String(80),
-        index=True,
+        db.String(64),
+        index=False,
         unique=False,
         nullable=False
     )
     number = db.Column(
-        db.String(64),
+        db.Integer,
         index=False,
         unique=False,
         nullable=False
@@ -38,37 +38,37 @@ class Player(db.Model):
         nullable=False
     )
     points = db.Column(
-        db.String(64),
+        db.Float,
         index=False,
         unique=False,
         nullable=False
     )
     rebounds = db.Column(
-        db.String(64),
+        db.Float,
         index=False,
         unique=False,
         nullable=False
     )
     assists = db.Column(
-        db.String(64),
+        db.Float,
         index=False,
         unique=False,
         nullable=False
     )
     steals = db.Column(
-        db.String(64),
+        db.Float,
         index=False,
         unique=False,
         nullable=False
     )
     blocks = db.Column(
-        db.String(64),
+        db.Float,
         index=False,
         unique=False,
         nullable=False
     )
     performance_index_rating = db.Column(
-        db.String(64),
+        db.Float,
         index=False,
         unique=False,
         nullable=False

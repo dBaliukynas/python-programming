@@ -1,9 +1,14 @@
 <nav
-  class="navbar navbar-expand-lg navbar-light"
+  class="navbar navbar-expand-lg navbar-dark bg-dark"
   style="background-color: #98d4ff"
 >
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">ELDb</a>
+    <a class="navbar-brand" href="#">
+      <div style="display: flex; align-items: center">
+        <img src="/static/images/logo.svg" style="width: 35px; height: 35px" />
+        <span>ELDb</span>
+      </div></a
+    >
     <button
       class="navbar-toggler"
       type="button"
@@ -31,7 +36,7 @@
         </li>
       </ul>
       <div style="width: 100%">
-        <form class="d-flex" style=" justify-content: center;">
+        <form class="d-flex" style="justify-content: center">
           <input
             class="form-control me-2"
             type="search"
@@ -39,10 +44,10 @@
             aria-label="Search"
             style="max-width: 500px"
           />
-          <button class="btn btn-outline-primary" type="submit">Search</button>
+          <button class="btn btn-outline-light" type="submit">Search</button>
         </form>
       </div>
-    <div style="width: 20%"></div>
+      <div style="width: 20%"></div>
     </div>
   </div>
 </nav>

@@ -30,7 +30,7 @@ class Team:
         self.players = {}
         self.name = name
         self.wins = wins
-        self.losses= losses
+        self.losses = losses
         self.win_streak = 0
         self.loss_streak = 0
         self.leaderboard_position = leaderboard_position

@@ -1,6 +1,3 @@
-import os
-import sys
-
 from flask import Flask, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate

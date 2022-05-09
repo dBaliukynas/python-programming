@@ -1,0 +1,22 @@
+{% macro card_component(title='Title') -%}
+<div
+  class="card"
+  style="
+    width: 18rem;
+    background-color: #3f3f3f;
+    color: white;
+    margin-left: 20px;
+    margin-bottom: 20px;
+  "
+>
+  <img src="..." class="card-img-top" alt="..." />
+  <div class="card-body" style="display: flex; flex-direction: column; text-align: center;">
+    <h5 class="card-title">{{title}}</h5>
+    <p class="card-text">
+      Some quick example text to build on the card title and make up the bulk of
+      the card's content.
+    </p>
+    <a href="#" type="button" class="btn btn-outline-light">Visit</a>
+  </div>
+</div>
+{%- endmacro %}

@@ -4,7 +4,6 @@ from flask_migrate import Migrate
 from flask_bootstrap import Bootstrap5
 
 from app.db import db
-from app.models import *
 from app import routes
 
 

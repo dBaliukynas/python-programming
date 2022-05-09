@@ -48,7 +48,8 @@ import card_component with context %}
       "
     >
       {%for i in range(0, 17)%} {{ card_component(title='Team',
-      image_path=team_logo_pathnames[i]) }} {%endfor%}
+      image_path='/static/images/team_logos/' + team_logo_pathnames[i]) }}
+      {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"
@@ -78,7 +79,8 @@ import card_component with context %}
         margin-bottom: 30px;
       "
     >
-      {%for i in range(0, 5)%} {{ card_component(title='Player') }} {%endfor%}
+      {%for player in players%} {{ card_component(title=player.name + ' ' +
+      player.surname, image_path=player.image_source) }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"

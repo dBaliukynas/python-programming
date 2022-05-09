@@ -4,7 +4,7 @@ from app.db import db
 
 class PlayerModel(db.Model):
     def __init__(self, name, surname, number, nationality, position, points,
-                 rebounds, assists, steals, blocks, performance_index_rating):
+                 rebounds, assists, steals, blocks, performance_index_rating, image_source):
 
         self.name = name
         self.surname = surname
@@ -17,6 +17,7 @@ class PlayerModel(db.Model):
         self.steals = steals
         self.blocks = blocks
         self.performance_index_rating = performance_index_rating
+        self.image_source = image_source
         self.created_at = datetime.now()
 
     __tablename__ = 'players'
@@ -86,6 +87,12 @@ class PlayerModel(db.Model):
     )
     performance_index_rating = db.Column(
         db.Float,
+        index=False,
+        unique=False,
+        nullable=False
+    )
+    image_source = db.Column(
+        db.String(256),
         index=False,
         unique=False,
         nullable=False

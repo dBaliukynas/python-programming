@@ -1,8 +1,8 @@
 """Add players table
 
-Revision ID: 0f94246c2407
+Revision ID: ca3cb5981c67
 Revises: 
-Create Date: 2022-05-08 14:50:33.389593
+Create Date: 2022-05-09 21:47:59.418869
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0f94246c2407'
+revision = 'ca3cb5981c67'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,6 +31,7 @@ def upgrade():
     sa.Column('steals', sa.Float(), nullable=False),
     sa.Column('blocks', sa.Float(), nullable=False),
     sa.Column('performance_index_rating', sa.Float(), nullable=False),
+    sa.Column('image_source', sa.String(length=256), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )

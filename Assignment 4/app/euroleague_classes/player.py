@@ -68,6 +68,8 @@ class Player:
                      player_dict['assists'], player_dict['steals'],
                      player_dict['blocks'],
                      player_dict['performance_index_rating'])
+                     
+        player.image_source = player_dict['image_source']
 
         player.fullname = player.name + ' ' + player.surname
 

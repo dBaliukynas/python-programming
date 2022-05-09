@@ -3,9 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bootstrap import Bootstrap5
 
-from .db import db
-from .models import *
-from . import routes
+from app.db import db
+from app.models import *
+from app import routes
 
 
 def create_app(test_config=None):

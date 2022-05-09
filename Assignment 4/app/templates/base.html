@@ -31,7 +31,7 @@ import card_component with context %}
         >
       </div>
     </div>
-    {% set team_logos_pathnames = ['alba_berlin_logo.png',
+    {% set team_logo_pathnames = ['alba_berlin_logo.png',
     'anadolu_efes_logo.png', 'as_monaco_logo.png', 'armani_logo.png',
     'baskonia_logo.png', 'crvena_zvezda_logo.png', 'fc_barcelona_logo.png',
     'fc_bayern_logo.png', 'fenerbahce_logo.png', 'ldlc_asvel_logo.png',
@@ -48,7 +48,7 @@ import card_component with context %}
       "
     >
       {%for i in range(0, 17)%} {{ card_component(title='Team',
-      image_path=team_logos_pathnames[i]) }} {%endfor%}
+      image_path=team_logo_pathnames[i]) }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"
@@ -97,7 +97,6 @@ import card_component with context %}
           >View all</a
         >
       </div>
-      >
     </div>
   </div>
 </div>

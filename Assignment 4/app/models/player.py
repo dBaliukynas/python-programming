@@ -1,6 +1,23 @@
+from datetime import datetime
 from app.db import db
 
-class Player(db.Model):
+
+class PlayerModel(db.Model):
+    def __init__(self, name, surname, number, nationality, position, points,
+                 rebounds, assists, steals, blocks, performance_index_rating):
+
+        self.name = name
+        self.surname = surname
+        self.number = number
+        self.nationality = nationality
+        self.position = position
+        self.points = points
+        self.rebounds = rebounds
+        self.assists = assists
+        self.steals = steals
+        self.blocks = blocks
+        self.performance_index_rating = performance_index_rating
+        self.created_at = datetime.now()
 
     __tablename__ = 'players'
     id = db.Column(

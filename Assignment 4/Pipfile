@@ -8,6 +8,7 @@ flask = "*"
 flask-sqlalchemy = "*"
 flask-migrate = "*"
 python-dotenv = "*"
+bootstrap-flask = "*"
 
 [dev-packages]
 

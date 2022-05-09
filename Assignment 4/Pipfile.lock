@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8e17609733b0d66a361be44d0d772a87e1f23d534f7ef4d4333856242c13d54e"
+            "sha256": "ed379dc1f815ed30b5c725c8ee80baf6ea18405e2d8fe6e0c544154806729b3d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -23,6 +23,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==1.7.7"
+        },
+        "bootstrap-flask": {
+            "hashes": [
+                "sha256:32867bb785dd2be84a045367401849c6afb1debba25b966b0c48e1fd62bb97c8",
+                "sha256:4ddd910c5a821d92d20aeda2476203814ca2e6764b4cf31768f134b3a07f5691"
+            ],
+            "index": "pypi",
+            "version": "==2.0.2"
         },
         "click": {
             "hashes": [
@@ -260,6 +268,14 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==2.1.2"
+        },
+        "wtforms": {
+            "hashes": [
+                "sha256:6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc",
+                "sha256:837f2f0e0ca79481b92884962b914eba4e72b7a2daaf1f939c890ed0124b834b"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==3.0.1"
         },
         "zipp": {
             "hashes": [

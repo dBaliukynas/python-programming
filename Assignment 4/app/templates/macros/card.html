@@ -1,4 +1,4 @@
-{% macro card_component(title='Title') -%}
+{% macro card_component(title='Title', image_path='') -%}
 <div
   class="card"
   style="
@@ -9,8 +9,23 @@
     margin-bottom: 20px;
   "
 >
-  <img src="..." class="card-img-top" alt="..." />
-  <div class="card-body" style="display: flex; flex-direction: column; text-align: center;">
+  <div style="height: 200px;     display: flex;">
+    <img
+      src="{{ url_for('static', filename='/images/team_logos/' + image_path) }}"
+      class="card-img-top"
+      style="
+        max-height: 180px;
+        object-fit: contain;
+        max-width: 180px;
+        margin: auto;
+      "
+      alt="..."
+    />
+  </div>
+  <div
+    class="card-body"
+    style="display: flex; flex-direction: column; text-align: center"
+  >
     <h5 class="card-title">{{title}}</h5>
     <p class="card-text">
       Some quick example text to build on the card title and make up the bulk of

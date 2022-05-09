@@ -1,67 +1,102 @@
-{% extends 'layout.html' %} {% block content %} {% from "macros/card.html" import
-card_component with context %}
+{% extends 'layout.html' %} {% block content %} {% from "macros/card.html"
+import card_component with context %}
 <div class="container-fluid">
   <div style="display: flex; flex-direction: column; align-items: center">
     <h2 class="display-6">Seasons</h2>
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
+    <div
+      style="
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 30px;
+      "
+    >
       {%for i in range(0, 5)%} {{ card_component(title='Season') }} {%endfor%}
-      <a
-        href="#"
-        type="button"
-        class="btn btn-dark"
-        style="
-          background-color: #3f3f3f;
-          width: 25%;
-          min-width: 250px;
-          height: 50px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 20px;
-        "
-        >View all</a
-      >
+      <div style="flex: 0 0 100%; display: flex; justify-content: center">
+        <a
+          href="#"
+          type="button"
+          class="btn btn-dark"
+          style="
+            background-color: #3f3f3f;
+            width: 25%;
+            min-width: 250px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+          "
+          >View all</a
+        >
+      </div>
     </div>
-
+    {% set team_logos_pathnames = ['alba_berlin_logo.png',
+    'anadolu_efes_logo.png', 'as_monaco_logo.png', 'armani_logo.png',
+    'baskonia_logo.png', 'crvena_zvezda_logo.png', 'fc_barcelona_logo.png',
+    'fc_bayern_logo.png', 'fenerbahce_logo.png', 'ldlc_asvel_logo.png',
+    'maccabi_logo.png', 'olympiacos_logo.png', 'panathinaikos_logo.png',
+    'real_madrid_logo.png', 'unics_logo.png', 'zalgiris_logo.png',
+    'zenit_logo.png' ] %}
     <h2 class="display-6">Teams</h2>
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
-      {%for i in range(0, 5)%} {{ card_component(title='Team') }} {%endfor%}
-      <a
-        href="#"
-        type="button"
-        class="btn btn-dark"
-        style="
-          background-color: #3f3f3f;
-          width: 25%;
-          min-width: 250px;
-          height: 50px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 20px;
-        "
-        >View all</a
-      >
+    <div
+      style="
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 30px;
+      "
+    >
+      {%for i in range(0, 17)%} {{ card_component(title='Team',
+      image_path=team_logos_pathnames[i]) }} {%endfor%}
+      <div style="flex: 0 0 100%; display: flex; justify-content: center">
+        <a
+          href="#"
+          type="button"
+          class="btn btn-dark"
+          style="
+            background-color: #3f3f3f;
+            width: 25%;
+            min-width: 250px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+          "
+          >View all</a
+        >
+      </div>
     </div>
 
     <h2 class="display-6">Players</h2>
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
+    <div
+      style="
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 30px;
+      "
+    >
       {%for i in range(0, 5)%} {{ card_component(title='Player') }} {%endfor%}
-      <a
-        href="#"
-        type="button"
-        class="btn btn-dark"
-        style="
-          background-color: #3f3f3f;
-          width: 25%;
-          min-width: 250px;
-          height: 50px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 20px;
-        "
-        >View all</a
+      <div style="flex: 0 0 100%; display: flex; justify-content: center">
+        <a
+          href="#"
+          type="button"
+          class="btn btn-dark"
+          style="
+            background-color: #3f3f3f;
+            width: 25%;
+            min-width: 250px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+          "
+          >View all</a
+        >
+      </div>
       >
     </div>
   </div>

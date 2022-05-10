@@ -9,7 +9,8 @@
     margin-bottom: 20px;
   "
 >
-  <div style="height: 200px;     display: flex;">
+  <div style="height: 200px;     display: flex; justify-content: center; align-items: center;">
+    {% if kwargs['instance'] != 'season' %}
     <img
       src="{{ image_path }}"
       class="card-img-top"
@@ -20,12 +21,21 @@
         margin: auto;
       "
       alt="..."
-    />
+    />{% else %}
+              <span
+            style="
+              font-family: '11S01 Black Tuesday', sans-serif;
+              font-size: 50px;
+            "
+            >2021-22</span
+          >
+      {% endif %}
   </div>
   <div
     class="card-body"
     style="display: flex; flex-direction: column; text-align: center"
   >
+    {% if kwargs['instance'] != 'season' %}
     <h5 class="card-title">{{title}}</h5>
     <p class="card-text">
       <div style="display: flex;
@@ -35,9 +45,10 @@
       <span>Nationality: <strong>{{ kwargs['player_nationality'] }}</strong></span>
       <span>Number: <strong>{{ kwargs['player_number'] }}</strong></span>
       <span>Position: <strong>{{ kwargs['player_position'] }}</strong></span>
-      {% endif %}
+    {% endif %}
     </div>
     </p>
+        {% endif %}
     <a href="{{ hyperlink }}" type="button" class="btn btn-outline-light">Visit</a>
   </div>
 </div>

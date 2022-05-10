@@ -11,9 +11,8 @@ import card_component with context %}
         margin-bottom: 30px;
       "
     >
-      {%for season in seasons%} {{ card_component(title=season.name,
-      image_path='/static/images/season_logos/season_2021_2022_logo.png',
-      instance='season') }} {%endfor%}
+      {%for season in seasons%} {{ card_component( instance='season') }}
+      {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"
@@ -33,13 +32,6 @@ import card_component with context %}
         >
       </div>
     </div>
-    {% set team_logo_pathnames = ['alba_berlin_logo.png',
-    'anadolu_efes_logo.png', 'armani_logo.png', 'as_monaco_logo.png',
-    'baskonia_logo.png', 'crvena_zvezda_logo.png', 'cska_logo.png',
-    'fc_barcelona_logo.png', 'fc_bayern_logo.png', 'fenerbahce_logo.png',
-    'ldlc_asvel_logo.png', 'maccabi_logo.png', 'olympiacos_logo.png',
-    'panathinaikos_logo.png', 'real_madrid_logo.png', 'unics_logo.png',
-    'zalgiris_logo.png', 'zenit_logo.png' ] %}
     <h2 class="display-6">Teams</h2>
     <div
       style="
@@ -50,8 +42,7 @@ import card_component with context %}
       "
     >
       {%for team in teams%} {{ card_component(title=team.name,
-      image_path='/static/images/team_logos/' +
-      team_logo_pathnames[loop.index0], instance='team') }} {%endfor%}
+      image_path=team.image_source, instance='team') }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"
@@ -82,7 +73,8 @@ import card_component with context %}
       "
     >
       {%for player in players%} {{ card_component(title=player.name + ' ' +
-      player.surname, hyperlink='player/' ~ (player.id), image_path=player.image_source, instance='player',
+      player.surname, hyperlink='player/' ~ (player.id),
+      image_path=player.image_source, instance='player',
       player_nationality=player.nationality, player_number=player.number,
       player_position=player.position) }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">

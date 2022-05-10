@@ -51,8 +51,10 @@ class Team:
 
         team = cls(team_dict['name'], team_dict['wins'], team_dict['losses'],
                    team_dict['leaderboard_position'])
+
         team.win_streak = 0
         team.loss_streak = 0
+        team.image_source = team_dict['image_source']
 
         team.players = {player['name'] + ' ' + player['surname']:Player.from_json(player)
              for player in team_dict['players'].values()}

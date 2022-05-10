@@ -3,7 +3,7 @@ from app.db import db
 
 
 class TeamModel(db.Model):
-    def __init__(self, name, wins, losses, win_streak, loss_streak, leaderboard_position):
+    def __init__(self, name, wins, losses, win_streak, loss_streak, leaderboard_position, image_source):
 
         self.name = name
         self.wins = wins
@@ -11,6 +11,7 @@ class TeamModel(db.Model):
         self.win_streak = win_streak
         self.loss_streak = loss_streak
         self.leaderboard_position = leaderboard_position
+        self.image_source = image_source
         self.created_at = datetime.now()
 
     __tablename__ = 'teams'
@@ -54,6 +55,12 @@ class TeamModel(db.Model):
         index=False,
         unique=False,
         nullable=True
+    )
+    image_source = db.Column(
+        db.String(256),
+        index=False,
+        unique=False,
+        nullable=False
     )
     created_at = db.Column(
         db.DateTime,

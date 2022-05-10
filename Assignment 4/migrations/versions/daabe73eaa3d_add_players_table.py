@@ -1,8 +1,8 @@
 """Add players table
 
-Revision ID: ca3cb5981c67
+Revision ID: daabe73eaa3d
 Revises: 
-Create Date: 2022-05-09 21:47:59.418869
+Create Date: 2022-05-10 20:38:14.426412
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ca3cb5981c67'
+revision = 'daabe73eaa3d'
 down_revision = None
 branch_labels = None
 depends_on = None

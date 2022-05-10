@@ -21,7 +21,7 @@ with create_app().app_context():
 
 for team in season[0].teams.values():
     team_instance = TeamModel(team.name, team.wins, team.losses,
-                              team.win_streak, team.loss_streak, team.leaderboard_position)
+                              team.win_streak, team.loss_streak, team.leaderboard_position,  team.image_source)
     with create_app().app_context():
         db.session.add(team_instance)
         db.session.commit()

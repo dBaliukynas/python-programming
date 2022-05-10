@@ -12,8 +12,8 @@ import card_component with context %}
       "
     >
       {%for season in seasons%} {{ card_component(title=season.name,
-      image_path='/static/images/season_logos/season_2021_2022_logo.png') }}
-      {%endfor%}
+      image_path='/static/images/season_logos/season_2021_2022_logo.png',
+      instance='season') }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"
@@ -51,7 +51,7 @@ import card_component with context %}
     >
       {%for team in teams%} {{ card_component(title=team.name,
       image_path='/static/images/team_logos/' +
-      team_logo_pathnames[loop.index0]) }} {%endfor%}
+      team_logo_pathnames[loop.index0], instance='team') }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"
@@ -82,9 +82,9 @@ import card_component with context %}
       "
     >
       {%for player in players%} {{ card_component(title=player.name + ' ' +
-      player.surname, image_path=player.image_source,
-      description=player.nationality ~ '\n' ~ player.number ~ '\n' ~
-      player.position) }} {%endfor%}
+      player.surname, hyperlink='player/' ~ (player.id), image_path=player.image_source, instance='player',
+      player_nationality=player.nationality, player_number=player.number,
+      player_position=player.position) }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"

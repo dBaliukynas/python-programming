@@ -1,11 +1,11 @@
-{% macro card_component(title='Title', image_path='', description='') -%}
+{% macro card_component(title='Title', hyperlink='#', image_path='') -%}
 <div
   class="card"
   style="
     width: 18rem;
     background-color: #3f3f3f;
     color: white;
-    margin-left: 20px;
+    {{'margin-left: 20px;' if kwargs['instance'] != 'season'}}
     margin-bottom: 20px;
   "
 >
@@ -28,9 +28,17 @@
   >
     <h5 class="card-title">{{title}}</h5>
     <p class="card-text">
-      {{description}}
+      <div style="display: flex;
+      flex-direction: column;
+      {{'height: 100px;' if kwargs['instance'] == 'player'}}">
+      {% if kwargs['instance'] == 'player' %}
+      <span>Nationality: <strong>{{ kwargs['player_nationality'] }}</strong></span>
+      <span>Number: <strong>{{ kwargs['player_number'] }}</strong></span>
+      <span>Position: <strong>{{ kwargs['player_position'] }}</strong></span>
+      {% endif %}
+    </div>
     </p>
-    <a href="#" type="button" class="btn btn-outline-light">Visit</a>
+    <a href="{{ hyperlink }}" type="button" class="btn btn-outline-light">Visit</a>
   </div>
 </div>
 {%- endmacro %}

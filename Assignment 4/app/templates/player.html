@@ -1,0 +1,69 @@
+{% extends 'layout.html' %} {% block content %}{% from "macros/edit_icon.html"
+import edit_icon_component with context %}{% from "macros/stats_card.html"
+import stats_card_component with context %}
+<div class="container-fluid">
+  <div
+    style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      position: absolute;
+      right: 30px;
+    "
+  >
+    {{edit_icon_component()}}
+    <p>Edit</p>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center">
+    <div style="display: flex; align-items: center; margin-bottom: 50px">
+      <img
+        src="{{player.image_source}}"
+        class="card-img-top"
+        style="object-fit: contain; max-width: 350px; margin: auto"
+        alt="..."
+      />
+      <div style="margin-left: 20px">
+        <h1 class="display-1" style="margin-bottom: unset">
+          {{player.name}} {{player.surname}}
+        </h1>
+        <div style="display: flex; flex-direction: column">
+          <span
+            style="
+              font-family: '11S01 Black Tuesday', sans-serif;
+              font-size: 50px;
+            "
+            >#{{player.number}}</span
+          >
+          <div style="display: flex; flex-direction: column; margin-top: 10px">
+            <span style="font-size: 20px"
+              >Nationality: <strong>{{player.nationality}}</strong></span
+            >
+            <span style="font-size: 20px"
+              >Position: <strong>{{player.position}}</strong></span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      style="
+        display: flex;
+        width: 100%;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+      "
+    >
+      {{stats_card_component(stats_name='Points', stats_value=player.points)}}
+      {{stats_card_component(stats_name='Rebounds',
+      stats_value=player.rebounds)}}
+      {{stats_card_component(stats_name='Assists', stats_value=player.assists)}}
+      {{stats_card_component(stats_name='Steals', stats_value=player.steals)}}
+      {{stats_card_component(stats_name='Blocks', stats_value=player.blocks)}}
+      {{stats_card_component(stats_name='Performance Index Rating',
+      stats_value=player.performance_index_rating, font_size='30px;',
+      line_height='75px;')}}
+    </div>
+  </div>
+</div>
+{% endblock %}

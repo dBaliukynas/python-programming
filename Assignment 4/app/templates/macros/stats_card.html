@@ -1,0 +1,41 @@
+{% macro stats_card_component(stats_name='', stats_value=None,
+font_size='50px;', line_height='unset') -%}
+<div
+  class="card mb-3"
+  style="
+    max-width: 540px;
+    max-height: 200px;
+    background-color: #3f3f3f;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+>
+  <div class="row g-0">
+    <div
+      class="col-md-4 display-2"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+        font-size: {{ font_size }}
+        width: 100%;
+        line-height: {{ line_height }}
+      "
+    >
+      {{stats_name}}
+    </div>
+    <span
+      style="
+        display: flex;
+        justify-content: center;
+        font-family: '11S01 Black Tuesday', sans-serif;
+        font-size: 50px;
+      "
+      >{{stats_value}}</span
+    >
+  </div>
+</div>
+{% endmacro %}

@@ -11,7 +11,9 @@ import card_component with context %}
         margin-bottom: 30px;
       "
     >
-      {%for i in range(0, 5)%} {{ card_component(title='Season') }} {%endfor%}
+      {%for season in seasons%} {{ card_component(title=season.name,
+      image_path='/static/images/season_logos/season_2021_2022_logo.png') }}
+      {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"
@@ -48,8 +50,8 @@ import card_component with context %}
       "
     >
       {%for team in teams%} {{ card_component(title=team.name,
-      image_path='/static/images/team_logos/' + team_logo_pathnames[loop.index0])
-      }} {%endfor%}
+      image_path='/static/images/team_logos/' +
+      team_logo_pathnames[loop.index0]) }} {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a
           href="#"

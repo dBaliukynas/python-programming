@@ -138,7 +138,7 @@ class EuroLeagueScraper:
 
         team_response = requests.get(team_hyperlink)
         team_doc = BeautifulSoup(team_response.text, 'html.parser')
-        
+
         team_name = team_doc.find('p', class_=re.compile('^club-info_name'))
         team_name = team_name.string
         team_win_loss = team_doc.find_all(
@@ -156,6 +156,9 @@ class EuroLeagueScraper:
             team_wins = None
             team_losses = None
 
+        team_image_source = team_doc.find('img', class_=re.compile(
+            '^club-info_logo')).attrs['data-srcset'].split('?')[0]
+
         players_list_doc = team_doc.find_all(
             'a', class_=re.compile('^game-roster-group-player_playerCard'))
 
@@ -165,9 +168,11 @@ class EuroLeagueScraper:
         team = Team(team_name, team_wins, team_losses,
                     team_leaderboard_position)
 
+        team.image_source = team_image_source
+
         if self.team_verbose:
             self.print_team_creation_info(team_response, team_doc, team_name,
-                                          team_win_loss, team_wins, team_losses, team_leaderboard_position)
+                                          team_win_loss, team_wins, team_losses, team_leaderboard_position, team_image_source)
 
         for player_hyperlink in player_hyperlinks:
             max_attempts = 2
@@ -192,7 +197,8 @@ class EuroLeagueScraper:
         return team
 
     @staticmethod
-    def print_team_creation_info(team_response, team_doc, team_name, team_win_loss, team_wins, team_losses, team_leaderboard_position):
+    def print_team_creation_info(team_response, team_doc, team_name, team_win_loss, team_wins,
+                                 team_losses, team_leaderboard_position, team_image_source):
         '''
         Print information about team creation.
         Parameters
@@ -230,6 +236,7 @@ class EuroLeagueScraper:
         print(f'Wins: {team_wins}')
         print(f'Losses: {team_losses}')
         print(f'Leaderboard position: {team_leaderboard_position}')
+        print(f'Team image source: {team_image_source}')
         print('---------------------------------------------------------------\n\n')
 
     @staticmethod
@@ -293,21 +300,25 @@ class EuroLeagueScraper:
             '^stats-item_name'))[0].previous_sibling.string)
         player_performance_index_rating = float(player_doc.find_all('span', text='PIR', class_=re.compile(
             '^stats-item_name'))[0].previous_sibling.string)
+        player_image_source = player_doc.find('img', class_=re.compile(
+            '^player-hero_image')).attrs['data-srcset'].split('320w')[0]
 
         player = Player(player_name, player_surname, player_number, player_nationality, player_position, player_points,
                         player_rebounds, player_assists, player_steals, player_blocks, player_performance_index_rating)
 
+        player.image_source = player_image_source
+
         if self.player_verbose:
             self.print_player_creation_info(player_response, player_doc, player_name, player_surname, player_number, player_nationality, player_position,
                                             player_points, player_rebounds, player_assists, player_steals, player_blocks,
-                                            player_performance_index_rating)
+                                            player_performance_index_rating, player_image_source)
 
         return player
 
     @staticmethod
     def print_player_creation_info(player_response, player_doc, player_name, player_surname, player_number, player_nationality,
                                    player_position, player_points, player_rebounds, player_assists, player_steals, player_blocks,
-                                   player_performance_index_rating):
+                                   player_performance_index_rating, player_image_source):
         '''
         Print information about player creation.
         Parameters
@@ -377,4 +388,5 @@ class EuroLeagueScraper:
         print(f'Steals: {player_steals}')
         print(f'Blocks: {player_blocks}')
         print(f'Performance Index Rating: {player_performance_index_rating}')
+        print(f'Player image source: {player_image_source}')
         print('---------------------------------------------------------------\n\n')

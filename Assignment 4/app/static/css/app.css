@@ -1,0 +1,38 @@
+input.stats-input {
+  font-family: "11S01 Black Tuesday", sans-serif;
+  font-size: 50px;
+  width: 125px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+input.display1 {
+    font-size: calc(1.625rem + 4.5vw);
+    font-weight: 300;
+    line-height: 1.2
+}
+@media only screen and  (min-width: 1200px) {
+    input.display1 {
+        font-size: 5rem;
+    }
+
+}
+input.bold-input {
+    font-weight: bolder;
+}
+input.name-input {
+    width: 600px;
+    margin-bottom: 10px;
+}
+input.number-input {
+    width: 125px;
+}
+input.nationality-input, input.position-input {
+    width: 300px;
+    margin-bottom: 10px;
+}
+.submit-button {
+    width: 300px;
+    height: 50px;
+    margin-bottom: 50px;
+}
+

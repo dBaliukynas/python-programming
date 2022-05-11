@@ -9,9 +9,9 @@ from instance_utils import file_operations as fo
 def main():
     start_scraper_time = time.perf_counter()
 
-    season_scraper = scraper.EuroLeagueScraper(
-        team_verbose=True, threading=False)
-    season_without_threading = season_scraper.create_season()
+    # season_scraper = scraper.EuroLeagueScraper(
+    #     team_verbose=True, threading=False)
+    # season_without_threading = season_scraper.create_season()
 
     finish_scraper_time = time.perf_counter()
     total_scraper_time = finish_scraper_time-start_scraper_time
@@ -21,7 +21,7 @@ def main():
     start_scraper_threading_time = time.perf_counter()
 
     season_scraper_threading = scraper.EuroLeagueScraper(
-        team_verbose=True)
+        team_verbose=True, player_verbose=False)
     season_with_threading = season_scraper_threading.create_season()
 
     finish_scraper_threading_time = time.perf_counter()
@@ -47,11 +47,11 @@ def main():
 
     print('------------------------------------------------------------------------\n')
 
-    fo.write_to_file([[season_without_threading], [season_with_threading]],
-                     '../data/testing1.json', '../data/testing2.json')
+    fo.write_to_file([[season_with_threading]],
+                     '../data/season.json')
 
-    season = fo.convert_to_instances(fo.load_from_file(
-        '../data/testing1.json', '../data/testing2.json'), vars(scraper))
+    # season = fo.convert_to_instances(fo.load_from_file(
+    #     '../data/testing1.json', '../data/testing2.json'), vars(scraper))
 
 
 if __name__ == '__main__':

@@ -1,8 +1,9 @@
 {% extends 'layout.html' %} {% block content %}{% from "macros/edit_icon.html"
 import edit_icon_component with context %}{% from "macros/stats_card.html"
-import stats_card_component with context %}
+import stats_card_component with context %}{% from 'bootstrap5/form.html' import
+render_field %}
 <div class="container-fluid">
-  <div
+  <a href="{{'/player/' ~ player.id ~ '/edit' if request.path == '/player/' ~ player.id else '/player/' ~ player.id}}"
     style="
       display: flex;
       flex-direction: column;
@@ -13,8 +14,12 @@ import stats_card_component with context %}
     "
   >
     {{edit_icon_component()}}
+    {%if request.path == '/player/' ~ player.id %}
     <p>Edit</p>
-  </div>
+    {%else %}
+    <p>Close</p>
+    {%endif%}
+</a>
   <div style="display: flex; flex-direction: column; align-items: center">
     <div style="display: flex; align-items: center; margin-bottom: 50px">
       <img
@@ -25,7 +30,10 @@ import stats_card_component with context %}
       />
       <div style="margin-left: 20px">
         <h1 class="display-1" style="margin-bottom: unset">
-          {{player.name}} {{player.surname}}
+          {%if  request.path == '/player/' ~ player.id ~ '/edit' %} {{form.name_value(class="form-control display1
+          name-input")}} {{form.surname_value(class="form-control display1
+          name-input")}} {%else %} {{player.name}} {{player.surname}} {% endif
+          %}
         </h1>
         <div style="display: flex; flex-direction: column">
           <span
@@ -33,14 +41,21 @@ import stats_card_component with context %}
               font-family: '11S01 Black Tuesday', sans-serif;
               font-size: 50px;
             "
-            >#{{player.number}}</span
+            >{%if request.path == '/player/' ~ player.id ~ '/edit'%} {{form.number_value(class="form-control stats-input
+            number-input")}} {%else%}#{{player.number}} {%endif%}</span
           >
           <div style="display: flex; flex-direction: column; margin-top: 10px">
-            <span style="font-size: 20px"
-              >Nationality: <strong>{{player.nationality}}</strong></span
+            <span style="font-size: 20px; display: flex">
+              Nationality:&nbsp; {%if request.path == '/player/' ~ player.id ~ '/edit'%}
+              {{form.nationality_value(class="form-control bold-input
+              nationality-input")}}{%else%}<strong
+                >{{player.nationality}}</strong
+              >{%endif%}</span
             >
-            <span style="font-size: 20px"
-              >Position: <strong>{{player.position}}</strong></span
+            <span style="font-size: 20px; display: flex"
+              >Position:&nbsp; {%if request.path == '/player/' ~ player.id ~ '/edit'%} {{form.position_value(class="form-control
+              bold-input position-input")}} {%else
+              %}<strong>{{player.position}}</strong>{%endif%}</span
             >
           </div>
         </div>
@@ -54,16 +69,27 @@ import stats_card_component with context %}
         flex-wrap: wrap;
       "
     >
-      {{stats_card_component(stats_name='Points', stats_value=player.points)}}
-      {{stats_card_component(stats_name='Rebounds',
-      stats_value=player.rebounds)}}
-      {{stats_card_component(stats_name='Assists', stats_value=player.assists)}}
-      {{stats_card_component(stats_name='Steals', stats_value=player.steals)}}
-      {{stats_card_component(stats_name='Blocks', stats_value=player.blocks)}}
+      {{stats_card_component(stats_name='Points', stats_value=player.points,
+      form=form.points_value(class="form-control stats-input"))}}
+      {{stats_card_component(stats_name='Rebounds', stats_value=player.rebounds,
+      form=form.rebounds_value(class="form-control stats-input"))}}
+      {{stats_card_component(stats_name='Assists', stats_value=player.assists,
+      form=form.assists_value(class="form-control stats-input"))}}
+      {{stats_card_component(stats_name='Steals', stats_value=player.steals,
+      form=form.steals_value(class="form-control stats-input"))}}
+      {{stats_card_component(stats_name='Blocks', stats_value=player.blocks,
+      form=form.blocks_value(class="form-control stats-input"))}}
       {{stats_card_component(stats_name='Performance Index Rating',
       stats_value=player.performance_index_rating, font_size='30px;',
-      line_height='75px;')}}
+      line_height='75px;',
+      form=form.performance_index_rating_value(class="form-control
+      stats-input"))}}
     </div>
+    <form action="" method="post">
+      {%if request.path == '/player/' ~ player.id ~ '/edit'%}
+      {{form.submit(class="btn btn-primary submit-button")}}
+      {%endif%}
+    </form>
   </div>
 </div>
 {% endblock %}

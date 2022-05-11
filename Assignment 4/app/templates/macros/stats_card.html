@@ -1,5 +1,5 @@
-{% macro stats_card_component(stats_name='', stats_value=None,
-font_size='50px;', line_height='unset') -%}
+{% macro stats_card_component(stats_name='', stats_value=none,
+font_size='50px;', line_height='unset', form=none) -%}
 <div
   class="card mb-3"
   style="
@@ -34,7 +34,9 @@ font_size='50px;', line_height='unset') -%}
         font-family: '11S01 Black Tuesday', sans-serif;
         font-size: 50px;
       "
-      >{{stats_value}}</span
+    >
+      {% if request.path == '/player/' ~ player.id ~ '/edit' %} {{form}} {% else %}
+      {{stats_value}} {% endif %}</span
     >
   </div>
 </div>

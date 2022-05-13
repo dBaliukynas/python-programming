@@ -55,7 +55,7 @@
         id="dropdownMenuButton2"
         data-bs-toggle="dropdown"
         aria-expanded="false"
-        style="color: #fff;"
+        style="color: #fff"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -75,20 +75,28 @@
       <ul
         class="dropdown-menu dropdown-menu-dark"
         aria-labelledby="dropdownMenuButton2"
-        style="left: unset; right: 10px; margin-top: 10px;    padding: 10px;"
+        style="left: unset; right: 10px; margin-top: 10px; padding: 10px"
       >
         <li>
           <a
-            class="dropdown-item active"
-            style="color: #000; background-color: #ffc61b"
+            class="dropdown-item header-dropdown-item"
+            style="{{'background-color: #ffc61b;' if request.path == '/season/create'}}"
             href="#"
             >Season</a
           >
         </li>
-        <li><a class="dropdown-item header-dropdown-item" href="#">Team</a></li>
-        <li><a class="dropdown-item header-dropdown-item" href="/player/create">Player</a></li>
+        <li><a class="dropdown-item header-dropdown-item"   style="{{'background-color: #ffc61b; color: black;' if request.path == '/team/create'}}" href="#">Team</a></li>
+        <li>
+          <a class="dropdown-item header-dropdown-item"   style="{{'background-color: #ffc61b; color: black;' if request.path == '/player/create'}}" href="/player/create"
+            >Player</a
+          >
+        </li>
         <li><hr class="dropdown-divider header-dropdown-item" /></li>
-        <li><a class="dropdown-item header-dropdown-item" href="#">Separated link</a></li>
+        <li>
+          <a class="dropdown-item header-dropdown-item" href="#"
+            >Separated link</a
+          >
+        </li>
       </ul>
     </div>
   </div>

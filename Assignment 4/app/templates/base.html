@@ -11,7 +11,7 @@ import card_component with context %}
         margin-bottom: 30px;
       "
     >
-      {%for season in seasons%} {{ card_component( instance='season') }}
+      {%for season in seasons%} {{ card_component( instance='season', title=season.name) }}
       {%endfor%}
       <div style="flex: 0 0 100%; display: flex; justify-content: center">
         <a

@@ -6,33 +6,53 @@ input.stats-input {
   text-align: center;
 }
 input.display1 {
-    font-size: calc(1.625rem + 4.5vw);
-    font-weight: 300;
-    line-height: 1.2
+  font-size: calc(1.625rem + 4.5vw);
+  font-weight: 300;
+  line-height: 1.2;
 }
-@media only screen and  (min-width: 1200px) {
-    input.display1 {
-        font-size: 5rem;
-    }
-
+@media only screen and (min-width: 1200px) {
+  input.display1 {
+    font-size: 5rem;
+  }
+}
+.main-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 50px;
+}
+@media only screen and (max-width: 930px) {
+  .main-info {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 input.bold-input {
-    font-weight: bolder;
+  font-weight: bolder;
 }
 input.name-input {
-    width: 600px;
-    margin-bottom: 10px;
+  width: 45vw;
+  margin-bottom: 10px;
+  min-width: 210px;
+  height: 13vh;
 }
 input.number-input {
-    width: 125px;
+  width: 125px;
 }
-input.nationality-input, input.position-input {
-    width: 300px;
-    margin-bottom: 10px;
+input.nationality-input,
+input.position-input {
+  width: 20vw;
+  min-width: 120px;
+  margin-bottom: 10px;
 }
 .submit-button {
-    width: 300px;
-    height: 50px;
-    margin-bottom: 50px;
+  width: 300px;
+  height: 50px;
+  margin-bottom: 50px;
 }
-
+.header-dropdown:focus {
+  box-shadow: unset !important;
+}
+a.dropdown-item.header-dropdown-item:active {
+  color: #3f3f3f;
+  background-color: #ffffff;
+}

@@ -27,7 +27,7 @@
               font-family: '11S01 Black Tuesday', sans-serif;
               font-size: 50px;
             "
-            >2021-22</span
+            >{{title}}</span
           >
       {% endif %}
   </div>
@@ -36,7 +36,7 @@
     style="display: flex; flex-direction: column; text-align: center"
   >
     {% if kwargs['instance'] != 'season' %}
-    <h5 class="card-title">{{title}}</h5>
+    <h5 class="card-title" style="    height: 30px;">{{title}}</h5>
     <p class="card-text">
       <div style="display: flex;
       flex-direction: column;

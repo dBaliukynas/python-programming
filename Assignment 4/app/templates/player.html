@@ -1,60 +1,117 @@
 {% extends 'layout.html' %} {% block content %}{% from "macros/edit_icon.html"
-import edit_icon_component with context %}{% from "macros/stats_card.html"
+import edit_icon_component with context %}{% from "macros/delete_icon.html"
+import delete_icon_component with context %}{% from "macros/stats_card.html"
 import stats_card_component with context %}{% from 'bootstrap5/form.html' import
 render_field %}
 <div class="container-fluid">
-  <a href="{{'/player/' ~ player.id ~ '/edit' if request.path == '/player/' ~ player.id else '/player/' ~ player.id}}"
+  <div
     style="
       display: flex;
       flex-direction: column;
       align-items: center;
-      cursor: pointer;
+      justify-content: center;
       position: absolute;
       right: 30px;
     "
   >
-    {{edit_icon_component()}}
-    {%if request.path == '/player/' ~ player.id %}
-    <p>Edit</p>
-    {%else %}
-    <p>Close</p>
+    {%if request.path != '/player/create' %}
+    <a
+      href="{{'/player/' ~ player.id ~ '/edit' if request.path == '/player/' ~ player.id else '/player/' ~ player.id}}"
+    >
+      <div style="display: flex; flex-direction: column; align-items: center">
+        {%if request.path == '/player/' ~ player.id %} {{edit_icon_component()}}
+        <p>Edit</p>
+
+        {%else %} {{edit_icon_component()}}
+        <p>Close</p>
+        {%endif%}
+      </div>
+    </a>
     {%endif%}
-</a>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+      "
+      data-bs-toggle="modal"
+      data-bs-target="#deletePlayerModal"
+    >
+      {%if request.path != '/player/create' %} {{delete_icon_component()}}
+      <p type="button">Delete</p>
+      {%endif%}
+    </div>
+  </div>
   <div style="display: flex; flex-direction: column; align-items: center">
-    <div style="display: flex; align-items: center; margin-bottom: 50px">
+    {%if request.path == '/player/create' %}
+    <h1 class="display-1" style="margin-bottom: 50px; font-size: 6rem">
+      Create player
+    </h1>
+    {%endif%}
+    <div class="main-info">
+      {%if request.path == '/player/create' %}
+      <button>Add image</button>
+      {%else%}
       <img
         src="{{player.image_source}}"
         class="card-img-top"
         style="object-fit: contain; max-width: 350px; margin: auto"
         alt="..."
       />
+      {%endif%}
       <div style="margin-left: 20px">
+        {%if request.path == '/player/' ~ player.id ~ '/edit' or request.path ==
+        '/player/create' %}
+        <span style="font-size: 20px">Name:</span>
         <h1 class="display-1" style="margin-bottom: unset">
-          {%if  request.path == '/player/' ~ player.id ~ '/edit' %} {{form.name_value(class="form-control display1
-          name-input")}} {{form.surname_value(class="form-control display1
-          name-input")}} {%else %} {{player.name}} {{player.surname}} {% endif
-          %}
+          {{form.name_value(class="form-control display1 name-input",
+          form="player-form")}}
         </h1>
+        <span style="font-size: 20px">Surname:</span>
+        <h1 class="display-1" style="margin-bottom: unset">
+          {{form.surname_value(class="form-control display1 name-input",
+          form="player-form")}}
+        </h1>
+        {%else %}
+        <h1 class="display-1" style="margin-bottom: unset">
+          {{player.name}} {{player.surname}}
+        </h1>
+        {%endif%}
         <div style="display: flex; flex-direction: column">
+          {%if request.path == '/player/' ~ player.id ~ '/edit' or request.path
+          == '/player/create'%}
+          <span style="font-size: 20px">Number: </span>
           <span
             style="
               font-family: '11S01 Black Tuesday', sans-serif;
               font-size: 50px;
             "
-            >{%if request.path == '/player/' ~ player.id ~ '/edit'%} {{form.number_value(class="form-control stats-input
-            number-input")}} {%else%}#{{player.number}} {%endif%}</span
+          >
+            {{form.number_value(class="form-control stats-input number-input",
+            form="player-form")}}</span
+          >
+          {%else%}
+          <span
+            style="
+              font-family: '11S01 Black Tuesday', sans-serif;
+              font-size: 50px;
+            "
+            >#{{player.number}} {%endif%}</span
           >
           <div style="display: flex; flex-direction: column; margin-top: 10px">
             <span style="font-size: 20px; display: flex">
-              Nationality:&nbsp; {%if request.path == '/player/' ~ player.id ~ '/edit'%}
+              Nationality:&nbsp; {%if request.path == '/player/' ~ player.id ~
+              '/edit' or request.path == '/player/create'%}
               {{form.nationality_value(class="form-control bold-input
-              nationality-input")}}{%else%}<strong
-                >{{player.nationality}}</strong
-              >{%endif%}</span
+              nationality-input",
+              form="player-form")}}{%else%}<strong>{{player.nationality}}</strong>{%endif%}</span
             >
             <span style="font-size: 20px; display: flex"
-              >Position:&nbsp; {%if request.path == '/player/' ~ player.id ~ '/edit'%} {{form.position_value(class="form-control
-              bold-input position-input")}} {%else
+              >Position:&nbsp; {%if request.path == '/player/' ~ player.id ~
+              '/edit' or request.path == '/player/create' %}
+              {{form.position_value(class="form-control bold-input
+              position-input", form="player-form")}} {%else
               %}<strong>{{player.position}}</strong>{%endif%}</span
             >
           </div>
@@ -70,26 +127,77 @@ render_field %}
       "
     >
       {{stats_card_component(stats_name='Points', stats_value=player.points,
-      form=form.points_value(class="form-control stats-input"))}}
+      form=form.points_value(class="form-control stats-input",
+      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
+      request.path == '/player/create')}}
       {{stats_card_component(stats_name='Rebounds', stats_value=player.rebounds,
-      form=form.rebounds_value(class="form-control stats-input"))}}
+      form=form.rebounds_value(class="form-control stats-input",
+      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
+      request.path == '/player/create')}}
       {{stats_card_component(stats_name='Assists', stats_value=player.assists,
-      form=form.assists_value(class="form-control stats-input"))}}
+      form=form.assists_value(class="form-control stats-input",
+      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
+      request.path == '/player/create')}}
       {{stats_card_component(stats_name='Steals', stats_value=player.steals,
-      form=form.steals_value(class="form-control stats-input"))}}
+      form=form.steals_value(class="form-control stats-input",
+      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
+      request.path == '/player/create')}}
       {{stats_card_component(stats_name='Blocks', stats_value=player.blocks,
-      form=form.blocks_value(class="form-control stats-input"))}}
+      form=form.blocks_value(class="form-control stats-input",
+      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
+      request.path == '/player/create')}}
       {{stats_card_component(stats_name='Performance Index Rating',
       stats_value=player.performance_index_rating, font_size='30px;',
       line_height='75px;',
-      form=form.performance_index_rating_value(class="form-control
-      stats-input"))}}
+      form=form.performance_index_rating_value(class="form-control stats-input",
+      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
+      request.path == '/player/create')}}
     </div>
-    <form action="" method="post">
+    {%if request.path == '/player/' ~ player.id ~ '/edit' or request.path ==
+    '/player/create' %}
+    <form action="" method="post" id="player-form">
       {%if request.path == '/player/' ~ player.id ~ '/edit'%}
-      {{form.submit(class="btn btn-primary submit-button")}}
-      {%endif%}
+      {{form.submit(class="btn btn-primary submit-button", value='Save')}}
+      {%elif request.path == '/player/create'%} {{form.submit(class="btn
+      btn-primary submit-button", value='Create')}} {%endif%}
     </form>
+    {%endif%}
+  </div>
+</div>
+<div
+  class="modal fade"
+  id="deletePlayerModal"
+  tabindex="-1"
+  aria-labelledby="deletePlayerModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deletePlayerModalLabel">Delete player</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete player
+        <strong>{{player.name}} {{player.surname}}</strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <a
+          href="{{'/player/' ~ player.id ~ '/delete'}}"
+          type="button"
+          class="btn btn-danger"
+          >Delete</a
+        >
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

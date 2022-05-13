@@ -35,7 +35,7 @@ font_size='50px;', line_height='unset', form=none) -%}
         font-size: 50px;
       "
     >
-      {% if request.path == '/player/' ~ player.id ~ '/edit' %} {{form}} {% else %}
+      {% if request.path == '/player/' ~ player.id ~ '/edit' or request.path == '/player/create' %} {{form}} {% else %}
       {{stats_value}} {% endif %}</span
     >
   </div>

@@ -64,25 +64,44 @@ with context %}
           position: relative;
         "
       >
-        <input
-          type="file"
-          id="file-input"
-          form="player-form"
-          style="
-            height: 530px;
-            width: 320px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            cursor: pointer;
-          "
-          onchange="updateFileName()"
-        />
+        {{form.image(class="image-input", form="player-form",
+        onchange="updateFileName()", id="file-input")}}}
+
         <img
           src="https://media-cdn.incrowdsports.com/5f998ba9-9307-4986-b5d0-946ed54e9c0e.png?width=320&resizeType=fill&format=webp"
-          style="height: 530px"
+          style="height: 530px; pointer-events: none"
         />
+        <h2
+          style="
+            display: flex;
+            justify-content: center;
+            font-size: 50px;
+            top: 170px;
+            color: black;
+            position: absolute;
+
+            pointer-events: none;
+          "
+          class="display-2"
+        >
+          Add image
+        </h2>
+        {{upload_icon_component(class='upload-icon')}}
+        <div
+          style="
+            width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: black;
+            position: absolute;
+            text-align: center;
+            pointer-events: none;
+            top: 300px;
+          "
+        >
+          <strong><span id="file-name"></span></strong>
+        </div>
         <div class="row g-0">
           <div
             class="col-md-4 display-2"
@@ -98,61 +117,51 @@ with context %}
           >
             {{stats_name}}
           </div>
-          <h2
-            style="
-              display: flex;
-              justify-content: center;
-              font-size: 50px;
-              color: black;
-              position: absolute;
-              top: 200px;
-              left: 0;
-              pointer-events: none;
-            "
-            class="display-2"
-          >
-            Add image
-          </h2>
-          {{upload_icon_component()}}
-          <div
-            style="
-              width: 180px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              color: black;
-              position: absolute;
-              text-align: center;
-              left: 75px;
-              top: 330px;
-            "
-          >
-            <span id="file-name"></span>
-          </div>
-
-          <script>
-            updateFileName = function () {
-              var input = document.getElementById("file-input");
-              var output = document.getElementById("file-name");
-
-              output.innerHTML = input.files
-                .item(0)
-                .name.replaceAll("&", /&/g)
-                .replaceAll("<", /</g)
-                .replaceAll(">", />/g)
-                .replaceAll('"', /"/g)
-                .replaceAll("'", /'/g);
-            };
-          </script>
         </div>
       </div>
       {%else%}
-      <img
-        src="{{player.image_source}}"
-        class="card-img-top"
-        style="object-fit: contain; max-width: 350px; margin: auto"
-        alt="..."
-      />
+      <div
+        style="
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+        "
+      >
+       {%if request.path == '/player/' ~ player.id ~ '/edit'%}
+        {{form.image(class="image-input", form="player-form",
+        onchange="updateFileName()", id="file-input")}}
+        {%endif%}
+        <img
+          src="{{player.image_source}}"
+          class="card-img-top {{'editable-image' if request.path == '/player/' ~ player.id ~ '/edit'}}"
+          style="
+            object-fit: contain;
+            max-width: 350px;
+            margin: auto;
+            pointer-events: none;
+          "
+          alt="..."
+        />
+        {%if request.path == '/player/' ~ player.id ~ '/edit'%}
+        {{upload_icon_component(class='upload-icon')}} {%endif%}
+                <div
+          style="
+            width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: black;
+            position: absolute;
+            text-align: center;
+            pointer-events: none;
+            top: 240px;
+          "
+        >
+          <strong><span id="file-name"></span></strong>
+        </div>
+      </div>
       {%endif%}
       <div style="margin-left: 20px">
         {%if request.path == '/player/' ~ player.id ~ '/edit' or request.path ==
@@ -299,4 +308,18 @@ with context %}
     </div>
   </div>
 </div>
+          <script>
+            updateFileName = function () {
+              var input = document.getElementById("file-input");
+              var output = document.getElementById("file-name");
+
+              output.innerHTML = input.files
+                .item(0)
+                .name.replaceAll("&", /&/g)
+                .replaceAll("<", /</g)
+                .replaceAll(">", />/g)
+                .replaceAll('"', /"/g)
+                .replaceAll("'", /'/g);
+            };
+          </script>
 {% endblock %}

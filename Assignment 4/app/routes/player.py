@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, abort, redirect, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, IntegerField, FileField
+import os
+from werkzeug.utils import secure_filename
 from app.db import db
 
 from app.models.player import PlayerModel
@@ -55,13 +57,21 @@ def update_player(player_id):
                       blocks_value=player.blocks, performance_index_rating_value=player.performance_index_rating)
 
     if request.method == 'POST':
+        file = form.image.data
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(
+            'app/static/images/', filename
+        ))
         player_values = ['name', 'surname', 'number', 'nationality', 'position', 'image_source',
                          'points', 'rebounds', 'assists', 'steals', 'blocks', 'performance_index_rating']
 
         for index, value in enumerate(form.data.values()):
             print(player)
             if index < len(form.data) - 2:
-                setattr(player, player_values[index], value)
+                if index == 5:
+                    setattr(player, player_values[index], f'/static/images/{file.filename}')
+                else:
+                    setattr(player, player_values[index], value)
 
         db.session.commit()
 
@@ -75,22 +85,24 @@ def create_player():
     form = PlayerForm()
 
     if request.method == 'POST':
-        player_values = ['name', 'surname', 'number', 'nationality', 'position',
+        player_values = ['name', 'surname', 'number', 'nationality', 'position', 'image_source',
                          'points', 'rebounds', 'assists', 'steals', 'blocks', 'performance_index_rating']
 
-        for index, value in enumerate(form.data.values()):
-            print(player)
-            if index < len(form.data) - 2:
-                setattr(player, player_values[index], value)
+        if (form.image.data is not None):
+            file = form.image.data
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(
+                'app/static/images/', filename
+            ))
 
         player_instance = PlayerModel(form.name_value.data, form.surname_value.data, form.number_value.data,
                                       form.nationality_value.data, form.position_value.data, form.points_value.data,
                                       form.rebounds_value.data, form.assists_value.data, form.steals_value.data,
-                                      form.blocks_value.data, form.performance_index_rating_value.data, 'Test')
+                                      form.blocks_value.data, form.performance_index_rating_value.data, f'/static/images/{file.filename}')
 
         db.session.add(player_instance)
         db.session.commit()
 
-        return redirect (f"/player/{player_instance.id}")
+        return redirect(f"/player/{player_instance.id}")
 
     return render_template("player.html", player=None, form=form)

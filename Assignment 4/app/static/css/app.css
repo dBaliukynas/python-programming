@@ -62,3 +62,21 @@ a.dropdown-item.header-dropdown-item:active {
 ::-webkit-file-upload-button {
   cursor: pointer;
 }
+.image-input {
+  height: 530px;
+  width: 320px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.editable-image {
+  opacity: 0.5;
+  cursor: pointer;
+}
+.upload-icon {
+  position: absolute;
+  pointer-events: none;
+}

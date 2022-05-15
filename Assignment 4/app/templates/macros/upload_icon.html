@@ -1,4 +1,4 @@
-{% macro upload_icon_component() -%}
+{% macro upload_icon_component(class) -%}
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="60"
@@ -9,8 +9,7 @@
   stroke-width="1"
   stroke-linecap="round"
   stroke-linejoin="round"
-  style="position: absolute; top: 260px; left: 0; pointer-events: none;"
-  }
+  class="{{class}}"
 >
   <path
     d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3"

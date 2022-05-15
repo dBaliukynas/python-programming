@@ -54,48 +54,39 @@ with context %}
       {%if request.path == '/player/create' %}
 
       <div
-        class="card mb-3"
         style="
           max-width: 540px;
 
-          background-color: #3f3f3f;
           color: white;
           display: flex;
           justify-content: center;
           align-items: center;
+          position: relative;
         "
       >
-        <button
+        <input
+          type="file"
+          id="file-input"
+          form="player-form"
           style="
-            background: none;
-            color: inherit;
-            border: none;
-            padding: 0;
-            font: inherit;
+            height: 530px;
+            width: 320px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
             cursor: pointer;
-            outline: inherit;
-            height: 480px;
-            padding: 20px;
           "
-        >
-          <input
-            type="file"
-            id="file-input"
+          onchange="updateFileName()"
+        />
+        <img
+          src="https://media-cdn.incrowdsports.com/5f998ba9-9307-4986-b5d0-946ed54e9c0e.png?width=320&resizeType=fill&format=webp"
+          style="height: 530px"
+        />
+        <div class="row g-0">
+          <div
+            class="col-md-4 display-2"
             style="
-              height: 480px;
-              width: 330.5px;
-              position: absolute;
-              top: 0;
-              left: 0;
-              opacity: 0;
-              cursor: pointer;
-            "
-            onchange="updateFileName()"
-          />
-          <div class="row g-0">
-            <div
-              class="col-md-4 display-2"
-              style="
         display: flex;
         justify-content: center;
         align-items: center;
@@ -104,43 +95,56 @@ with context %}
         width: 100%;
         line-height: {{ line_height }}
       "
-            >
-              {{stats_name}}
-            </div>
-            <h2
-              style="display: flex; justify-content: center; font-size: 50px"
-              class="display-2"
-            >
-              Add image
-            </h2>
-            {{upload_icon_component()}}
-            <script>
-              updateFileName = function () {
-                var input = document.getElementById("file-input");
-                var output = document.getElementById("file-name");
-
-                output.innerHTML = input.files
-                  .item(0)
-                  .name.replaceAll("&", /&/g)
-                  .replaceAll("<", /</g)
-                  .replaceAll(">", />/g)
-                  .replaceAll('"', /"/g)
-                  .replaceAll("'", /'/g);
-              };
-            </script>
+          >
+            {{stats_name}}
           </div>
-
+          <h2
+            style="
+              display: flex;
+              justify-content: center;
+              font-size: 50px;
+              color: black;
+              position: absolute;
+              top: 200px;
+              left: 0;
+              pointer-events: none;
+            "
+            class="display-2"
+          >
+            Add image
+          </h2>
+          {{upload_icon_component()}}
           <div
             style="
-              width: 290px;
+              width: 180px;
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
+              color: black;
+              position: absolute;
+              text-align: center;
+              left: 75px;
+              top: 330px;
             "
           >
             <span id="file-name"></span>
           </div>
-        </button>
+
+          <script>
+            updateFileName = function () {
+              var input = document.getElementById("file-input");
+              var output = document.getElementById("file-name");
+
+              output.innerHTML = input.files
+                .item(0)
+                .name.replaceAll("&", /&/g)
+                .replaceAll("<", /</g)
+                .replaceAll(">", />/g)
+                .replaceAll('"', /"/g)
+                .replaceAll("'", /'/g);
+            };
+          </script>
+        </div>
       </div>
       {%else%}
       <img
@@ -245,7 +249,12 @@ with context %}
     </div>
     {%if request.path == '/player/' ~ player.id ~ '/edit' or request.path ==
     '/player/create' %}
-    <form action="" method="post" id="player-form">
+    <form
+      action=""
+      method="post"
+      id="player-form"
+      enctype="multipart/form-data"
+    >
       {%if request.path == '/player/' ~ player.id ~ '/edit'%}
       {{form.submit(class="btn btn-primary submit-button", value='Save')}}
       {%elif request.path == '/player/create'%} {{form.submit(class="btn

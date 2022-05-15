@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, abort, redirect, request
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField, IntegerField
+from wtforms import StringField, SubmitField, FloatField, IntegerField, FileField
 from app.db import db
 
 from app.models.player import PlayerModel
@@ -14,6 +14,7 @@ class PlayerForm(FlaskForm):
     number_value = IntegerField()
     nationality_value = StringField()
     position_value = StringField()
+    image = FileField()
     points_value = FloatField()
     rebounds_value = FloatField()
     assists_value = FloatField()
@@ -54,7 +55,7 @@ def update_player(player_id):
                       blocks_value=player.blocks, performance_index_rating_value=player.performance_index_rating)
 
     if request.method == 'POST':
-        player_values = ['name', 'surname', 'number', 'nationality', 'position',
+        player_values = ['name', 'surname', 'number', 'nationality', 'position', 'image_source',
                          'points', 'rebounds', 'assists', 'steals', 'blocks', 'performance_index_rating']
 
         for index, value in enumerate(form.data.values()):

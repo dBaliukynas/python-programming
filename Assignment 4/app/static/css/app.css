@@ -59,3 +59,6 @@ a.dropdown-item.header-dropdown-item:active {
   color: #3f3f3f;
   background-color: #ffffff;
 }
+::-webkit-file-upload-button {
+  cursor: pointer;
+}

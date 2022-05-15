@@ -59,17 +59,25 @@ def update_player(player_id):
     if request.method == 'POST':
         file = form.image.data
         filename = secure_filename(file.filename)
-        file.save(os.path.join(
-            'app/static/images/', filename
-        ))
+
+        if (form.image.data is not None and form.image.data.headers['Content-Type'] != 'application/octet-stream'):
+
+            file.save(os.path.join(
+                'app/static/images/', filename
+            ))
+
         player_values = ['name', 'surname', 'number', 'nationality', 'position', 'image_source',
                          'points', 'rebounds', 'assists', 'steals', 'blocks', 'performance_index_rating']
 
         for index, value in enumerate(form.data.values()):
-            print(player)
+
             if index < len(form.data) - 2:
-                if index == 5:
-                    setattr(player, player_values[index], f'/static/images/{file.filename}')
+                if index == 5 and form.image.data.headers['Content-Type'] != 'application/octet-stream':
+                    setattr(player, player_values[index],
+                            f'/static/images/{file.filename}')
+                elif index == 5 and form.image.data.headers['Content-Type'] == 'application/octet-stream':
+                    break
+
                 else:
                     setattr(player, player_values[index], value)
 
@@ -85,12 +93,13 @@ def create_player():
     form = PlayerForm()
 
     if request.method == 'POST':
+        file = form.image.data
+        filename = secure_filename(file.filename)
+
         player_values = ['name', 'surname', 'number', 'nationality', 'position', 'image_source',
                          'points', 'rebounds', 'assists', 'steals', 'blocks', 'performance_index_rating']
 
-        if (form.image.data is not None):
-            file = form.image.data
-            filename = secure_filename(file.filename)
+        if (form.image.data is not None and form.image.data.headers['Content-Type'] != 'application/octet-stream'):
             file.save(os.path.join(
                 'app/static/images/', filename
             ))
@@ -98,7 +107,7 @@ def create_player():
         player_instance = PlayerModel(form.name_value.data, form.surname_value.data, form.number_value.data,
                                       form.nationality_value.data, form.position_value.data, form.points_value.data,
                                       form.rebounds_value.data, form.assists_value.data, form.steals_value.data,
-                                      form.blocks_value.data, form.performance_index_rating_value.data, f'/static/images/{file.filename}')
+                                      form.blocks_value.data, form.performance_index_rating_value.data, f'/static/images/{file.filename}' if form.image.data is not None and form.image.data.headers['Content-Type'] != 'application/octet-stream' else None)
 
         db.session.add(player_instance)
         db.session.commit()

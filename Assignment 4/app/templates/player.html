@@ -134,7 +134,7 @@ with context %}
         onchange="updateFileName()", id="file-input")}}
         {%endif%}
         <img
-          src="{{player.image_source}}"
+          src="{{player.image_source if player.image_source is not none else 'https://media-cdn.incrowdsports.com/5f998ba9-9307-4986-b5d0-946ed54e9c0e.png?width=320&resizeType=fill&format=webp'}}"
           class="card-img-top {{'editable-image' if request.path == '/player/' ~ player.id ~ '/edit'}}"
           style="
             object-fit: contain;

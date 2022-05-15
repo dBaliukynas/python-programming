@@ -31,7 +31,7 @@ def upgrade():
     sa.Column('steals', sa.Float(), nullable=False),
     sa.Column('blocks', sa.Float(), nullable=False),
     sa.Column('performance_index_rating', sa.Float(), nullable=False),
-    sa.Column('image_source', sa.String(length=256), nullable=False),
+    sa.Column('image_source', sa.String(length=256), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )

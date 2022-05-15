@@ -60,7 +60,7 @@ class TeamModel(db.Model):
         db.String(256),
         index=False,
         unique=False,
-        nullable=False
+        nullable=True
     )
     created_at = db.Column(
         db.DateTime,

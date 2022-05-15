@@ -26,7 +26,7 @@ def upgrade():
     sa.Column('win_streak', sa.Integer(), nullable=False),
     sa.Column('loss_streak', sa.Integer(), nullable=False),
     sa.Column('leaderboard_position', sa.Integer(), nullable=True),
-    sa.Column('image_source', sa.String(length=256), nullable=False),
+    sa.Column('image_source', sa.String(length=256), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )

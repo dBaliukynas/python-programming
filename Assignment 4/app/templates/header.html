@@ -35,6 +35,7 @@
           <a class="nav-link" href="#">Players</a>
         </li>
       </ul>
+         {{ form.submit() }}
       <div style="width: 100%">
         <form class="d-flex" style="justify-content: center">
           <input
@@ -44,8 +45,10 @@
             aria-label="Search"
             style="max-width: 500px"
           />
-          <button class="btn btn-outline-light" type="submit">Search</button>
+          <a class="btn btn-outline-light" href="/search" type="submit">Search</a>
+         
         </form>
+      
       </div>
       <div style="width: 20%"></div>
 

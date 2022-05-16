@@ -4,9 +4,9 @@ from app.models.player import PlayerModel
 from app.models.team import TeamModel
 from app.models.season import SeasonModel
 
-base_blueprint = Blueprint('base', __name__, template_folder='templates')
+from app.routes.main import main_blueprint
 
-@base_blueprint.route("/")
+@main_blueprint.route("/")
 def base():
     players = PlayerModel.query.all()
     teams = TeamModel.query.order_by(TeamModel.name.asc()).all()

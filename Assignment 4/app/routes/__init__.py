@@ -1,6 +1,12 @@
-from .base import base_blueprint
-from .player import player_blueprint
+from flask import Blueprint
+
+from app.routes.main import main_blueprint
+
+import app.routes.base
+import app.routes.player
+import app.routes.search
+
 
 def init_app(app):
-    app.register_blueprint(base_blueprint)
-    app.register_blueprint(player_blueprint)
+
+    app.register_blueprint(main_blueprint)

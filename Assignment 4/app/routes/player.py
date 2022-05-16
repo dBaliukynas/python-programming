@@ -7,7 +7,7 @@ from app.db import db
 
 from app.models.player import PlayerModel
 
-player_blueprint = Blueprint('player', __name__, template_folder='templates')
+from app.routes.main import main_blueprint
 
 
 class PlayerForm(FlaskForm):
@@ -27,16 +27,16 @@ class PlayerForm(FlaskForm):
     submit = SubmitField()
 
 
-@player_blueprint.route("/player/<int:player_id>")
+@main_blueprint.route("/player/<int:player_id>")
 def player(player_id):
     player_id = int(player_id)
     player = PlayerModel.query.filter(
         PlayerModel.id == player_id).first_or_404()
 
-    return render_template("player.html", player=player, form='')
+    return render_template("player.html", player=player)
 
 
-@player_blueprint.route("/player/<int:player_id>/delete")
+@main_blueprint.route("/player/<int:player_id>/delete")
 def delete_player(player_id):
     player_id = int(player_id)
     PlayerModel.query.filter(PlayerModel.id == player_id).delete()
@@ -44,7 +44,7 @@ def delete_player(player_id):
     return redirect("/")
 
 
-@player_blueprint.route("/player/<int:player_id>/edit", methods=['GET', 'POST'])
+@main_blueprint.route("/player/<int:player_id>/edit", methods=['GET', 'POST'])
 def update_player(player_id):
     player_id = int(player_id)
     player = PlayerModel.query.filter(
@@ -88,7 +88,7 @@ def update_player(player_id):
     return render_template("player.html", player=player, form=form)
 
 
-@player_blueprint.route("/player/create", methods=['GET', 'POST'])
+@main_blueprint.route("/player/create", methods=['GET', 'POST'])
 def create_player():
     form = PlayerForm()
 

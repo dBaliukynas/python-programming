@@ -11,18 +11,18 @@ from app.routes.main import main_blueprint
 
 
 class PlayerForm(FlaskForm):
-    name_value = StringField()
-    surname_value = StringField()
-    number_value = IntegerField()
-    nationality_value = StringField()
-    position_value = StringField()
+    name_field = StringField()
+    surname_field = StringField()
+    number_field = IntegerField()
+    nationality_field = StringField()
+    position_field = StringField()
     image = FileField()
-    points_value = FloatField()
-    rebounds_value = FloatField()
-    assists_value = FloatField()
-    steals_value = FloatField()
-    blocks_value = FloatField()
-    performance_index_rating_value = FloatField()
+    points_field = FloatField()
+    rebounds_field = FloatField()
+    assists_field = FloatField()
+    steals_field = FloatField()
+    blocks_field = FloatField()
+    performance_index_rating_field = FloatField()
 
     submit = SubmitField()
 
@@ -50,11 +50,11 @@ def update_player(player_id):
     player = PlayerModel.query.filter(
         PlayerModel.id == player_id).first_or_404()
 
-    form = PlayerForm(name_value=player.name, surname_value=player.surname, number_value=player.number,
-                      nationality_value=player.nationality, position_value=player.position,
-                      points_value=player.points, rebounds_value=player.rebounds,
-                      assists_value=player.assists, steals_value=player.steals,
-                      blocks_value=player.blocks, performance_index_rating_value=player.performance_index_rating)
+    form = PlayerForm(name_field=player.name, surname_field=player.surname, number_field=player.number,
+                      nationality_field=player.nationality, position_field=player.position,
+                      points_field=player.points, rebounds_field=player.rebounds,
+                      assists_field=player.assists, steals_field=player.steals,
+                      blocks_field=player.blocks, performance_index_rating_field=player.performance_index_rating)
 
     if request.method == 'POST':
         file = form.image.data
@@ -104,10 +104,10 @@ def create_player():
                 'app/static/images/', filename
             ))
 
-        player_instance = PlayerModel(form.name_value.data, form.surname_value.data, form.number_value.data,
-                                      form.nationality_value.data, form.position_value.data, form.points_value.data,
-                                      form.rebounds_value.data, form.assists_value.data, form.steals_value.data,
-                                      form.blocks_value.data, form.performance_index_rating_value.data, f'/static/images/{file.filename}' if form.image.data is not None and form.image.data.headers['Content-Type'] != 'application/octet-stream' else None)
+        player_instance = PlayerModel(form.name_field.data, form.surname_field.data, form.number_field.data,
+                                      form.nationality_field.data, form.position_field.data, form.points_field.data,
+                                      form.rebounds_field.data, form.assists_field.data, form.steals_field.data,
+                                      form.blocks_field.data, form.performance_index_rating_field.data, f'/static/images/{file.filename}' if form.image.data is not None and form.image.data.headers['Content-Type'] != 'application/octet-stream' else None)
 
         db.session.add(player_instance)
         db.session.commit()

@@ -1,6 +1,22 @@
-{% extends 'layout.html' %} {% block content %}
+{% extends 'layout.html' %} {% block content %} {% from "macros/card.html"
+import card_component with context %}
 <div class="container-fluid"></div>
-
-<h1 class="display-1" style="text-align: center;">Search</h1>
-
+<h1 class="display-1" style="text-align: center">Search</h1>
+<div style="display: flex; flex-direction: column; align-items: center">
+  <div
+    style="
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 30px;
+    "
+  >
+    {%for player in players%} {{ card_component(title=player.name + ' ' +
+    player.surname, hyperlink='player/' ~ (player.id), image_path=
+    player.image_source if player.image_source is not none else
+    'https://media-cdn.incrowdsports.com/5f998ba9-9307-4986-b5d0-946ed54e9c0e.png?width=320&resizeType=fill&format=webp'
+    , instance='player', player_nationality=player.nationality,
+    player_number=player.number, player_position=player.position) }} {%endfor%}
+  </div>
+</div>
 {% endblock %}

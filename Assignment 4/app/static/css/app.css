@@ -80,3 +80,6 @@ a.dropdown-item.header-dropdown-item:active {
   position: absolute;
   pointer-events: none;
 }
+.header-search-field {
+  max-width: 500px;
+}

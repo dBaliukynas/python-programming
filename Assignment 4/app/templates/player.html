@@ -168,12 +168,12 @@ with context %}
         '/player/create' %}
         <span style="font-size: 20px">Name:</span>
         <h1 class="display-1" style="margin-bottom: unset">
-          {{form.name_value(class="form-control display1 name-input",
+          {{form.name_field(class="form-control display1 name-input",
           form="player-form")}}
         </h1>
         <span style="font-size: 20px">Surname:</span>
         <h1 class="display-1" style="margin-bottom: unset">
-          {{form.surname_value(class="form-control display1 name-input",
+          {{form.surname_field(class="form-control display1 name-input",
           form="player-form")}}
         </h1>
         {%else %}
@@ -191,7 +191,7 @@ with context %}
               font-size: 50px;
             "
           >
-            {{form.number_value(class="form-control stats-input number-input",
+            {{form.number_field(class="form-control stats-input number-input",
             form="player-form")}}</span
           >
           {%else%}
@@ -206,14 +206,14 @@ with context %}
             <span style="font-size: 20px; display: flex">
               Nationality:&nbsp; {%if request.path == '/player/' ~ player.id ~
               '/edit' or request.path == '/player/create'%}
-              {{form.nationality_value(class="form-control bold-input
+              {{form.nationality_field(class="form-control bold-input
               nationality-input",
               form="player-form")}}{%else%}<strong>{{player.nationality}}</strong>{%endif%}</span
             >
             <span style="font-size: 20px; display: flex"
               >Position:&nbsp; {%if request.path == '/player/' ~ player.id ~
               '/edit' or request.path == '/player/create' %}
-              {{form.position_value(class="form-control bold-input
+              {{form.position_field(class="form-control bold-input
               position-input", form="player-form")}} {%else
               %}<strong>{{player.position}}</strong>{%endif%}</span
             >
@@ -230,29 +230,29 @@ with context %}
       "
     >
       {{stats_card_component(stats_name='Points', stats_value=player.points,
-      form=form.points_value(class="form-control stats-input",
+      form=form.points_field(class="form-control stats-input",
       form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
       request.path == '/player/create')}}
       {{stats_card_component(stats_name='Rebounds', stats_value=player.rebounds,
-      form=form.rebounds_value(class="form-control stats-input",
+      form=form.rebounds_field(class="form-control stats-input",
       form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
       request.path == '/player/create')}}
       {{stats_card_component(stats_name='Assists', stats_value=player.assists,
-      form=form.assists_value(class="form-control stats-input",
+      form=form.assists_field(class="form-control stats-input",
       form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
       request.path == '/player/create')}}
       {{stats_card_component(stats_name='Steals', stats_value=player.steals,
-      form=form.steals_value(class="form-control stats-input",
+      form=form.steals_field(class="form-control stats-input",
       form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
       request.path == '/player/create')}}
       {{stats_card_component(stats_name='Blocks', stats_value=player.blocks,
-      form=form.blocks_value(class="form-control stats-input",
+      form=form.blocks_field(class="form-control stats-input",
       form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
       request.path == '/player/create')}}
       {{stats_card_component(stats_name='Performance Index Rating',
       stats_value=player.performance_index_rating, font_size='30px;',
       line_height='75px;',
-      form=form.performance_index_rating_value(class="form-control stats-input",
+      form=form.performance_index_rating_field(class="form-control stats-input",
       form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
       request.path == '/player/create')}}
     </div>

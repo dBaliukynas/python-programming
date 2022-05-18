@@ -35,20 +35,18 @@
           <a class="nav-link" href="#">Players</a>
         </li>
       </ul>
-         {{ form.submit() }}
+
       <div style="width: 100%">
-        <form class="d-flex" style="justify-content: center">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-            style="max-width: 500px"
-          />
-          <a class="btn btn-outline-light" href="/search" type="submit">Search</a>
-         
+        <form
+          class="d-flex"
+          style="justify-content: center"
+          action="{{url_for('main.search')}}"
+          id="header-form"
+        >
+          {{ header_form.search_field(placeholder='Search', class="form-control
+          me-2 header-search-field") }} {{ header_form.submit(class='btn
+          btn-outline-light', value='Search') }}
         </form>
-      
       </div>
       <div style="width: 20%"></div>
 
@@ -88,9 +86,19 @@
             >Season</a
           >
         </li>
-        <li><a class="dropdown-item header-dropdown-item"   style="{{'background-color: #ffc61b; color: black;' if request.path == '/team/create'}}" href="#">Team</a></li>
         <li>
-          <a class="dropdown-item header-dropdown-item"   style="{{'background-color: #ffc61b; color: black;' if request.path == '/player/create'}}" href="/player/create"
+          <a
+            class="dropdown-item header-dropdown-item"
+            style="{{'background-color: #ffc61b; color: black;' if request.path == '/team/create'}}"
+            href="#"
+            >Team</a
+          >
+        </li>
+        <li>
+          <a
+            class="dropdown-item header-dropdown-item"
+            style="{{'background-color: #ffc61b; color: black;' if request.path == '/player/create'}}"
+            href="/player/create"
             >Player</a
           >
         </li>

@@ -10,6 +10,7 @@ flask-migrate = "*"
 python-dotenv = "*"
 bootstrap-flask = "*"
 flask-wtf = "*"
+flask-mysqldb = "*"
 
 [dev-packages]
 

@@ -1,7 +1,9 @@
+import os
+
 from flask import Blueprint, render_template, abort, redirect, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, IntegerField, FileField
-import os
+from wtforms.validators import DataRequired, InputRequired, ValidationError
 from werkzeug.utils import secure_filename
 from app.db import db
 
@@ -9,20 +11,25 @@ from app.models.player import PlayerModel
 
 from app.routes.main import main_blueprint
 
+def float_required(form, field):
+    if not isinstance(field.data, float):
+        raise ValidationError('Field must be float')
+
 
 class PlayerForm(FlaskForm):
-    name_field = StringField()
-    surname_field = StringField()
-    number_field = IntegerField()
-    nationality_field = StringField()
-    position_field = StringField()
+
+    name_field = StringField(validators=[DataRequired()])
+    surname_field = StringField(validators=[DataRequired()])
+    number_field = IntegerField(validators=[DataRequired()])
+    nationality_field = StringField(validators=[DataRequired()])
+    position_field = StringField(validators=[DataRequired()])
     image = FileField()
-    points_field = FloatField()
-    rebounds_field = FloatField()
-    assists_field = FloatField()
-    steals_field = FloatField()
-    blocks_field = FloatField()
-    performance_index_rating_field = FloatField()
+    points_field = FloatField(validators=[InputRequired()])
+    rebounds_field = FloatField(validators=[InputRequired()])
+    assists_field = FloatField(validators=[InputRequired()])
+    steals_field = FloatField(validators=[InputRequired()])
+    blocks_field = FloatField(validators=[InputRequired()])
+    performance_index_rating_field = FloatField(validators=[InputRequired()])
 
     submit = SubmitField()
 
@@ -56,7 +63,7 @@ def update_player(player_id):
                       assists_field=player.assists, steals_field=player.steals,
                       blocks_field=player.blocks, performance_index_rating_field=player.performance_index_rating)
 
-    if request.method == 'POST':
+    if form.validate_on_submit():
         file = form.image.data
         filename = secure_filename(file.filename)
 
@@ -76,7 +83,7 @@ def update_player(player_id):
                     setattr(player, player_values[index],
                             f'/static/images/{file.filename}')
                 elif index == 5 and form.image.data.headers['Content-Type'] == 'application/octet-stream':
-                    break
+                    continue
 
                 else:
                     setattr(player, player_values[index], value)
@@ -92,7 +99,7 @@ def update_player(player_id):
 def create_player():
     form = PlayerForm()
 
-    if request.method == 'POST':
+    if form.validate_on_submit():
         file = form.image.data
         filename = secure_filename(file.filename)
 

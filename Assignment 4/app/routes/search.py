@@ -12,7 +12,7 @@ from app.models.player import PlayerModel
 
 
 class SearchForm(FlaskForm):
-    search_field = StringField()
+    search_field = StringField(validators=[DataRequired()])
     submit = SubmitField()
 
 

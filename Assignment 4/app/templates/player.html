@@ -129,10 +129,9 @@ with context %}
           flex-direction: column;
         "
       >
-       {%if request.path == '/player/' ~ player.id ~ '/edit'%}
+        {%if request.path == '/player/' ~ player.id ~ '/edit'%}
         {{form.image(class="image-input", form="player-form",
-        onchange="updateFileName()", id="file-input")}}
-        {%endif%}
+        onchange="updateFileName()", id="file-input")}} {%endif%}
         <img
           src="{{player.image_source if player.image_source is not none else 'https://media-cdn.incrowdsports.com/5f998ba9-9307-4986-b5d0-946ed54e9c0e.png?width=320&resizeType=fill&format=webp'}}"
           class="card-img-top {{'editable-image' if request.path == '/player/' ~ player.id ~ '/edit'}}"
@@ -146,7 +145,7 @@ with context %}
         />
         {%if request.path == '/player/' ~ player.id ~ '/edit'%}
         {{upload_icon_component(class='upload-icon')}} {%endif%}
-                <div
+        <div
           style="
             width: 180px;
             white-space: nowrap;
@@ -229,32 +228,140 @@ with context %}
         flex-wrap: wrap;
       "
     >
-      {{stats_card_component(stats_name='Points', stats_value=player.points,
-      form=form.points_field(class="form-control stats-input",
-      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
-      request.path == '/player/create')}}
-      {{stats_card_component(stats_name='Rebounds', stats_value=player.rebounds,
-      form=form.rebounds_field(class="form-control stats-input",
-      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
-      request.path == '/player/create')}}
-      {{stats_card_component(stats_name='Assists', stats_value=player.assists,
-      form=form.assists_field(class="form-control stats-input",
-      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
-      request.path == '/player/create')}}
-      {{stats_card_component(stats_name='Steals', stats_value=player.steals,
-      form=form.steals_field(class="form-control stats-input",
-      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
-      request.path == '/player/create')}}
-      {{stats_card_component(stats_name='Blocks', stats_value=player.blocks,
-      form=form.blocks_field(class="form-control stats-input",
-      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
-      request.path == '/player/create')}}
-      {{stats_card_component(stats_name='Performance Index Rating',
-      stats_value=player.performance_index_rating, font_size='30px;',
-      line_height='75px;',
-      form=form.performance_index_rating_field(class="form-control stats-input",
-      form="player-form")if request.path == '/player/' ~ player.id ~ '/edit' or
-      request.path == '/player/create')}}
+      <div>
+        {{stats_card_component(stats_name='Points', stats_value=player.points,
+        form=form.points_field(class="form-control stats-input",
+        form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
+        or request.path == '/player/create')}} {%if request.path == '/player/' ~
+        player.id ~ '/edit' or request.path == '/player/create' %}
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+            text-align: center;
+          "
+        >
+          <small class="form-text text-muted">
+            {{ ', '.join(form.errors['points_field']) }}
+          </small>
+        </div>
+
+        {%endif%}
+      </div>
+      <div>
+        {{stats_card_component(stats_name='Rebounds',
+        stats_value=player.rebounds,
+        form=form.rebounds_field(class="form-control stats-input",
+        form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
+        or request.path == '/player/create')}} {%if request.path == '/player/' ~
+        player.id ~ '/edit' or request.path == '/player/create' %}
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+            text-align: center;
+          "
+        >
+          <small class="form-text text-muted">
+            {{ ', '.join(form.errors['rebounds_field']) }}
+          </small>
+        </div>
+
+        {%endif%}
+      </div>
+      <div>
+        {{stats_card_component(stats_name='Assists', stats_value=player.assists,
+        form=form.assists_field(class="form-control stats-input",
+        form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
+        or request.path == '/player/create')}}
+        {%if request.path == '/player/' ~
+        player.id ~ '/edit' or request.path == '/player/create' %}
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+            text-align: center;
+          "
+        >
+          <small class="form-text text-muted">
+            {{ ', '.join(form.errors['assists_field']) }}
+          </small>
+        </div>
+
+        {%endif%}
+      </div>
+      <div>
+        {{stats_card_component(stats_name='Steals', stats_value=player.steals,
+        form=form.steals_field(class="form-control stats-input",
+        form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
+        or request.path == '/player/create')}}
+
+        {%if request.path == '/player/' ~
+        player.id ~ '/edit' or request.path == '/player/create' %}
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+            text-align: center;
+          "
+        >
+          <small class="form-text text-muted">
+            {{ ', '.join(form.errors['steals_field']) }}
+          </small>
+        </div>
+
+        {%endif%}
+      </div>
+      <div>
+        {{stats_card_component(stats_name='Blocks', stats_value=player.blocks,
+        form=form.blocks_field(class="form-control stats-input",
+        form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
+        or request.path == '/player/create')}}
+        {%if request.path == '/player/' ~
+        player.id ~ '/edit' or request.path == '/player/create' %}
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+            text-align: center;
+          "
+        >
+          <small class="form-text text-muted">
+            {{ ', '.join(form.errors['blocks_field']) }}
+          </small>
+        </div>
+
+        {%endif%}
+      </div>
+      <div>
+        {{stats_card_component(stats_name='Performance Index Rating',
+        stats_value=player.performance_index_rating, font_size='30px;',
+        line_height='75px;',
+        form=form.performance_index_rating_field(class="form-control
+        stats-input", form="player-form")if request.path == '/player/' ~
+        player.id ~ '/edit' or request.path == '/player/create')}}
+        {%if request.path == '/player/' ~
+        player.id ~ '/edit' or request.path == '/player/create' %}
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+            text-align: center;
+          "
+        >
+          <small class="form-text text-muted">
+            {{ ', '.join(form.errors['performance_index_rating_field']) }}
+          </small>
+        </div>
+
+        {%endif%}
+      </div>
     </div>
     {%if request.path == '/player/' ~ player.id ~ '/edit' or request.path ==
     '/player/create' %}
@@ -264,10 +371,11 @@ with context %}
       id="player-form"
       enctype="multipart/form-data"
     >
-      {%if request.path == '/player/' ~ player.id ~ '/edit'%}
-      {{form.submit(class="btn btn-primary submit-button", value='Save')}}
-      {%elif request.path == '/player/create'%} {{form.submit(class="btn
-      btn-primary submit-button", value='Create')}} {%endif%}
+      {{ form.csrf_token }} {%if request.path == '/player/' ~ player.id ~
+      '/edit'%} {{form.submit(class="btn btn-primary submit-button",
+      value='Save')}} {%elif request.path == '/player/create'%}
+      {{form.submit(class="btn btn-primary submit-button", value='Create')}}
+      {%endif%}
     </form>
     {%endif%}
   </div>
@@ -308,18 +416,18 @@ with context %}
     </div>
   </div>
 </div>
-          <script>
-            updateFileName = function () {
-              var input = document.getElementById("file-input");
-              var output = document.getElementById("file-name");
+<script>
+  updateFileName = function () {
+    var input = document.getElementById("file-input");
+    var output = document.getElementById("file-name");
 
-              output.innerHTML = input.files
-                .item(0)
-                .name.replaceAll("&", /&/g)
-                .replaceAll("<", /</g)
-                .replaceAll(">", />/g)
-                .replaceAll('"', /"/g)
-                .replaceAll("'", /'/g);
-            };
-          </script>
+    output.innerHTML = input.files
+      .item(0)
+      .name.replaceAll("&", /&/g)
+      .replaceAll("<", /</g)
+      .replaceAll(">", />/g)
+      .replaceAll('"', /"/g)
+      .replaceAll("'", /'/g);
+  };
+</script>
 {% endblock %}

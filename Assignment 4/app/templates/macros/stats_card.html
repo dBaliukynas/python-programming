@@ -1,7 +1,7 @@
 {% macro stats_card_component(stats_name='', stats_value=none,
 font_size='50px;', line_height='unset', form=none) -%}
 <div
-  class="card mb-3"
+  class="card"
   style="
     max-width: 540px;
     max-height: 200px;
@@ -35,8 +35,8 @@ font_size='50px;', line_height='unset', form=none) -%}
         font-size: 50px;
       "
     >
-      {% if request.path == '/player/' ~ player.id ~ '/edit' or request.path == '/player/create' %} {{form}} {% else %}
-      {{stats_value}} {% endif %}</span
+      {% if request.path == '/player/' ~ player.id ~ '/edit' or request.path ==
+      '/player/create' %} {{form}} {% else %} {{stats_value}} {% endif %}</span
     >
   </div>
 </div>

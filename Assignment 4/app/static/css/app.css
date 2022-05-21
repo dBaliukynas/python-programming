@@ -83,3 +83,7 @@ a.dropdown-item.header-dropdown-item:active {
 .header-search-field {
   max-width: 500px;
 }
+
+.stats-card {
+  margin-bottom: 30px;
+}

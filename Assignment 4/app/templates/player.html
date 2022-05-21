@@ -228,7 +228,7 @@ with context %}
         flex-wrap: wrap;
       "
     >
-      <div>
+      <div class="stats-card">
         {{stats_card_component(stats_name='Points', stats_value=player.points,
         form=form.points_field(class="form-control stats-input",
         form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
@@ -249,7 +249,7 @@ with context %}
 
         {%endif%}
       </div>
-      <div>
+      <div class="stats-card">
         {{stats_card_component(stats_name='Rebounds',
         stats_value=player.rebounds,
         form=form.rebounds_field(class="form-control stats-input",
@@ -271,7 +271,7 @@ with context %}
 
         {%endif%}
       </div>
-      <div>
+      <div class="stats-card">
         {{stats_card_component(stats_name='Assists', stats_value=player.assists,
         form=form.assists_field(class="form-control stats-input",
         form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
@@ -293,7 +293,7 @@ with context %}
 
         {%endif%}
       </div>
-      <div>
+      <div class="stats-card">
         {{stats_card_component(stats_name='Steals', stats_value=player.steals,
         form=form.steals_field(class="form-control stats-input",
         form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
@@ -316,7 +316,7 @@ with context %}
 
         {%endif%}
       </div>
-      <div>
+      <div class="stats-card">
         {{stats_card_component(stats_name='Blocks', stats_value=player.blocks,
         form=form.blocks_field(class="form-control stats-input",
         form="player-form")if request.path == '/player/' ~ player.id ~ '/edit'
@@ -338,7 +338,7 @@ with context %}
 
         {%endif%}
       </div>
-      <div>
+      <div class="stats-card">
         {{stats_card_component(stats_name='Performance Index Rating',
         stats_value=player.performance_index_rating, font_size='30px;',
         line_height='75px;',

@@ -5,15 +5,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, IntegerField, FileField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 from werkzeug.utils import secure_filename
+
 from app.db import db
 
 from app.models.player import PlayerModel
 
 from app.routes.main import main_blueprint
-
-def float_required(form, field):
-    if not isinstance(field.data, float):
-        raise ValidationError('Field must be float')
 
 
 class PlayerForm(FlaskForm):

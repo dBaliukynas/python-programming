@@ -62,6 +62,8 @@ with context %}
           justify-content: center;
           align-items: center;
           position: relative;
+          max-width: 350px;
+          max-height: 530px;
         "
       >
         {{form.image(class="image-input", form="player-form",
@@ -69,7 +71,10 @@ with context %}
 
         <img
           src="https://media-cdn.incrowdsports.com/5f998ba9-9307-4986-b5d0-946ed54e9c0e.png?width=320&resizeType=fill&format=webp"
-          style="height: 530px; pointer-events: none"
+          style="pointer-events: none;
+          height: 530px;
+          width: 350px;
+          object-fit: contain;"
         />
         <h2
           style="
@@ -97,7 +102,7 @@ with context %}
             position: absolute;
             text-align: center;
             pointer-events: none;
-            top: 300px;
+            top: 55%;
           "
         >
           <strong><span id="file-name"></span></strong>
@@ -127,6 +132,8 @@ with context %}
           justify-content: center;
           align-items: center;
           flex-direction: column;
+          width: 350px;
+          height: 530px;
         "
       >
         {%if request.path == '/player/' ~ player.id ~ '/edit'%}
@@ -137,7 +144,7 @@ with context %}
           class="card-img-top {{'editable-image' if request.path == '/player/' ~ player.id ~ '/edit'}}"
           style="
             object-fit: contain;
-            max-width: 350px;
+            height: 530px; width: 350px;
             margin: auto;
             pointer-events: none;
           "
@@ -155,7 +162,7 @@ with context %}
             position: absolute;
             text-align: center;
             pointer-events: none;
-            top: 240px;
+            top: 55%;
           "
         >
           <strong><span id="file-name"></span></strong>
@@ -177,7 +184,10 @@ with context %}
         </h1>
         {%else %}
         <h1 class="display-1" style="margin-bottom: unset">
-          {{player.name}} {{player.surname}}
+          {{player.name}}
+        </h1>
+        <h1 class="display-1" style="margin-bottom: unset">
+        {{player.surname}}
         </h1>
         {%endif%}
         <div style="display: flex; flex-direction: column">

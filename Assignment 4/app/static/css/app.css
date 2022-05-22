@@ -63,8 +63,8 @@ a.dropdown-item.header-dropdown-item:active {
   cursor: pointer;
 }
 .image-input {
+  width: 350px;
   height: 530px;
-  width: 320px;
   position: absolute;
   top: 0;
   left: 0;
@@ -75,6 +75,7 @@ a.dropdown-item.header-dropdown-item:active {
 .editable-image {
   opacity: 0.5;
   cursor: pointer;
+
 }
 .upload-icon {
   position: absolute;

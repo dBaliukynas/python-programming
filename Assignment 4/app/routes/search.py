@@ -26,12 +26,12 @@ def inject_global_template_variables():
 def search():
     header_form = SearchForm(request.args)
     search_value = header_form.data['search_field']
-    print(search_value)
+
     players = PlayerModel.query.filter(PlayerModel.name.like(
         search_value + '%') |
         PlayerModel.surname.like(search_value + '%') |
         PlayerModel.number.like(search_value + '%') |
         PlayerModel.nationality.like(search_value + '%')).all()
-    print(players)
+
 
     return render_template("search.html", players=players)
